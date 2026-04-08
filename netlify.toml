@@ -1,0 +1,5 @@
+[build]
+base = "frontlineapp"
+# remove or change the line below
+publish = "frontlineapp/.netlify/next"
+command = "npm run build"
