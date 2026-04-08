@@ -64,9 +64,6 @@ export function CheckoutView() {
       <h1 className="font-display mt-2 text-3xl font-extrabold tracking-tight text-[var(--text-primary)] sm:text-4xl">
         BNPL Checkout
       </h1>
-      <p className="mt-2 max-w-xl text-sm text-[var(--text-secondary)]">
-        Merchants get paid instantly from the pool. You repay the principal interest-free within {REPAYMENT_DAYS} days.
-      </p>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-5">
         <div className="border-border bg-surface-card overflow-hidden rounded-2xl border lg:col-span-3">

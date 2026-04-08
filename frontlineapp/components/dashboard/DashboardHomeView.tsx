@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { BNPL_FEE_BPS, REPAYMENT_DAYS } from "@/lib/session/catalog";
 import { CONTRACTS, shortAddr, hashscanUrl } from "@/lib/contracts";
 import { fmtFlt, fmtFltCompact, fmtPct } from "@/lib/session/format";
 import { useFrontlineSession } from "@/lib/session/session-store";
@@ -100,39 +99,17 @@ export function DashboardHomeView() {
         </Link>
       </div>
 
-      <section className="mt-12 grid gap-4 lg:grid-cols-2">
-        <div className="border-border bg-surface-card rounded-2xl border p-6">
-          <h2 className="font-display text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">How it works</h2>
-          <ol className="mt-4 space-y-3 text-sm text-[var(--text-secondary)]">
-            <li className="flex gap-3">
-              <span className="text-accent-mint font-mono text-xs font-bold">01</span>
-              <span>Mint FLT from the <strong className="text-primary">Faucet</strong> to fund your wallet</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="text-accent-mint font-mono text-xs font-bold">02</span>
-              <span>Browse <strong className="text-primary">Merchants</strong>, add products, checkout with BNPL</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="text-accent-cyan font-mono text-xs font-bold">03</span>
-              <span>Repay within {REPAYMENT_DAYS} days to build your <strong className="text-primary">Reputation</strong></span>
-            </li>
-            <li className="flex gap-3">
-              <span className="text-accent-amber font-mono text-xs font-bold">04</span>
-              <span>Stake FLT in <strong className="text-primary">Liquidity</strong> to earn yield from {BNPL_FEE_BPS / 100}% BNPL fees</span>
-            </li>
-          </ol>
-        </div>
-
+      <section className="mt-12">
         <div className="border-border bg-surface-card rounded-2xl border p-6">
           <h2 className="font-display text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">Contracts</h2>
           <p className="text-muted mt-1 text-xs">Deployed on Hedera Testnet</p>
-          <dl className="mt-4 space-y-3 text-sm">
+          <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-3 text-sm">
             {[
               { label: "Frontline Token", addr: CONTRACTS.flt },
               { label: "Frontline Pool", addr: CONTRACTS.pool },
               { label: "Reputation", addr: CONTRACTS.reputation },
             ].map((c) => (
-              <div key={c.label} className="flex items-center justify-between gap-4">
+              <div key={c.label} className="flex items-center gap-3">
                 <dt className="text-[var(--text-secondary)]">{c.label}</dt>
                 <dd>
                   {c.addr ? (

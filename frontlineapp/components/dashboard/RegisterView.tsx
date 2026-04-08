@@ -150,12 +150,8 @@ export function RegisterView() {
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       <p className="text-accent-mint text-[10px] font-bold uppercase tracking-[0.25em]">On-chain</p>
       <h1 className="font-display mt-2 text-3xl font-extrabold tracking-tight text-[var(--text-primary)] sm:text-4xl">
-        Merchant registration
+        Merchant
       </h1>
-      <p className="mt-3 max-w-xl text-sm text-[var(--text-secondary)]">
-        Register your connected wallet as a merchant on the Frontline pool contract.
-        Once registered, your address can receive BNPL payouts from shoppers.
-      </p>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-5">
         <div className="border-border bg-surface-card rounded-2xl border p-6 lg:col-span-3">
@@ -242,35 +238,17 @@ export function RegisterView() {
         </div>
 
         <div className="border-border bg-surface-elevated/80 rounded-2xl border p-6 lg:col-span-2">
-          <h2 className="font-display text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">How it works</h2>
-          <ul className="mt-4 space-y-3 text-sm text-[var(--text-secondary)]">
-            <li className="flex gap-2">
-              <span className="text-accent-mint font-bold">1.</span>
-              Connect your Hashpack wallet
-            </li>
-            <li className="flex gap-2">
-              <span className="text-accent-mint font-bold">2.</span>
-              Enter your merchant name and category
-            </li>
-            <li className="flex gap-2">
-              <span className="text-accent-mint font-bold">3.</span>
-              Approve the transaction — your wallet address becomes a registered merchant
-            </li>
-            <li className="flex gap-2">
-              <span className="text-accent-mint font-bold">4.</span>
-              Add products below — shoppers can then pay you via BNPL
-            </li>
-          </ul>
-
           {connected ? (
-            <div className="border-border mt-5 border-t border-dashed pt-4">
-              <p className="text-muted text-[10px] font-bold uppercase tracking-wider">Your wallet</p>
+            <div>
+              <p className="text-muted text-[10px] font-bold uppercase tracking-wider">Wallet</p>
               <p className="mt-1 truncate font-mono text-xs text-[var(--accent-mint)]">{accountId}</p>
               {isMerchant ? (
-                <p className="text-accent-cyan mt-1 text-[10px] font-bold uppercase">✓ Registered merchant</p>
+                <p className="text-accent-cyan mt-2 text-[10px] font-bold uppercase">✓ Registered</p>
               ) : null}
             </div>
-          ) : null}
+          ) : (
+            <p className="text-accent-amber text-sm">Connect wallet to register</p>
+          )}
 
           {CONTRACTS.pool ? (
             <div className="border-border mt-4 border-t border-dashed pt-4">
@@ -291,13 +269,9 @@ export function RegisterView() {
       {/* ====== Product Management (visible when registered as merchant) ====== */}
       {isMerchant && connected ? (
         <section className="mt-10">
-          <p className="text-accent-cyan text-[10px] font-bold uppercase tracking-[0.25em]">Products</p>
-          <h2 className="font-display mt-2 text-2xl font-extrabold tracking-tight text-[var(--text-primary)]">
-            Add products
+          <h2 className="font-display text-2xl font-extrabold tracking-tight text-[var(--text-primary)]">
+            Products
           </h2>
-          <p className="mt-2 max-w-xl text-sm text-[var(--text-secondary)]">
-            Add products to your on-chain catalog. Shoppers will see them in the marketplace.
-          </p>
 
           <div className="mt-6 grid gap-6 lg:grid-cols-5">
             <div className="border-border bg-surface-card rounded-2xl border p-6 lg:col-span-3">
@@ -377,13 +351,9 @@ export function RegisterView() {
       {/* ====== Merchant Balance Withdraw ====== */}
       {isMerchant && connected && merchantBalance > 0 ? (
         <section className="mt-10">
-          <p className="text-accent-amber text-[10px] font-bold uppercase tracking-[0.25em]">Earnings</p>
-          <h2 className="font-display mt-2 text-2xl font-extrabold tracking-tight text-[var(--text-primary)]">
-            Merchant balance
+          <h2 className="font-display text-2xl font-extrabold tracking-tight text-[var(--text-primary)]">
+            Earnings
           </h2>
-          <p className="mt-2 max-w-xl text-sm text-[var(--text-secondary)]">
-            Accumulated earnings from BNPL settlements. Withdraw FLT to your wallet.
-          </p>
 
           <div className="mt-6 max-w-md">
             <div className="border-border bg-surface-card rounded-2xl border p-6">

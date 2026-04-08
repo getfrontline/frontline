@@ -28,9 +28,6 @@ export function MarketplaceView() {
           <h1 className="font-display mt-2 text-3xl font-extrabold tracking-tight text-[var(--text-primary)] sm:text-4xl">
             Merchants &amp; products
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-[var(--text-secondary)]">
-            Browse on-chain merchants and their products — checkout splits instant payouts per merchant from the pool.
-          </p>
         </div>
         {linesInCart > 0 ? (
           <Link
