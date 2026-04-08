@@ -48,6 +48,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const hcRef = useRef<any>(null);
   const initPromiseRef = useRef<Promise<void> | null>(null);
   const initedRef = useRef(false);
+  const accountIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    accountIdRef.current = accountId;
+  }, [accountId]);
 
   useEffect(() => {
     if (initedRef.current || typeof window === "undefined") return;
@@ -79,6 +84,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         };
 
         const hc = new HashConnect(LedgerId.TESTNET, WC_PROJECT_ID, appMetadata, true);
+        hcRef.current = hc;
 
         hc.pairingEvent.on((data: { accountIds?: string[] }) => {
           if (data.accountIds && data.accountIds.length > 0) {
@@ -92,12 +98,18 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setStatus("ready");
         });
 
-        await hc.init();
-        hcRef.current = hc;
+        await Promise.race([
+          hc.init(),
+          new Promise((_, reject) => {
+            window.setTimeout(() => {
+              reject(new Error("HashConnect initialization timed out"));
+            }, 10000);
+          }),
+        ]);
         setStatus("ready");
       } catch (err) {
         console.error("[Frontline] HashConnect init failed", err);
-        setStatus("disconnected");
+        setStatus(hcRef.current ? "ready" : "disconnected");
       }
     })();
   }, []);
@@ -111,6 +123,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setStatus("connecting");
     try {
       await hc.openPairingModal("dark");
+      if (!accountIdRef.current) {
+        setStatus("ready");
+      }
     } catch (err) {
       console.error("[Frontline] openPairingModal failed", err);
       setStatus("ready");

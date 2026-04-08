@@ -1,0 +1,348 @@
+{
+  "compiler": {
+    "version": "0.8.24+commit.e11b9ed9"
+  },
+  "language": "Solidity",
+  "output": {
+    "abi": [
+      {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "caller",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "internalType": "bool",
+            "name": "authorized",
+            "type": "bool",
+            "indexed": false
+          }
+        ],
+        "type": "event",
+        "name": "AuthorizedCallerUpdated",
+        "anonymous": false
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "internalType": "uint256",
+            "name": "loanId",
+            "type": "uint256",
+            "indexed": true
+          },
+          {
+            "internalType": "bool",
+            "name": "onTime",
+            "type": "bool",
+            "indexed": false
+          },
+          {
+            "internalType": "uint16",
+            "name": "newScore",
+            "type": "uint16",
+            "indexed": false
+          },
+          {
+            "internalType": "uint16",
+            "name": "streak",
+            "type": "uint16",
+            "indexed": false
+          }
+        ],
+        "type": "event",
+        "name": "RepaymentRecorded",
+        "anonymous": false
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "INITIAL_SCORE",
+        "outputs": [
+          {
+            "internalType": "uint16",
+            "name": "",
+            "type": "uint16"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "LATE_DELTA",
+        "outputs": [
+          {
+            "internalType": "int16",
+            "name": "",
+            "type": "int16"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "MAX_SCORE",
+        "outputs": [
+          {
+            "internalType": "uint16",
+            "name": "",
+            "type": "uint16"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "MIN_SCORE",
+        "outputs": [
+          {
+            "internalType": "uint16",
+            "name": "",
+            "type": "uint16"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "ON_TIME_DELTA",
+        "outputs": [
+          {
+            "internalType": "int16",
+            "name": "",
+            "type": "int16"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "authorizedCallers",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "getProfile",
+        "outputs": [
+          {
+            "internalType": "struct FrontlineReputation.Profile",
+            "name": "",
+            "type": "tuple",
+            "components": [
+              {
+                "internalType": "uint16",
+                "name": "score",
+                "type": "uint16"
+              },
+              {
+                "internalType": "uint16",
+                "name": "onTimeStreak",
+                "type": "uint16"
+              },
+              {
+                "internalType": "uint32",
+                "name": "totalRepayments",
+                "type": "uint32"
+              },
+              {
+                "internalType": "uint32",
+                "name": "lateRepayments",
+                "type": "uint32"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "owner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "profiles",
+        "outputs": [
+          {
+            "internalType": "uint16",
+            "name": "score",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "onTimeStreak",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint32",
+            "name": "totalRepayments",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "lateRepayments",
+            "type": "uint32"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "loanId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "onTime",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "name": "recordRepayment"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "caller",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "authorized",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "name": "setAuthorizedCaller"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "tierOf",
+        "outputs": [
+          {
+            "internalType": "string",
+            "name": "",
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "name": "transferOwnership"
+      }
+    ],
+    "devdoc": {
+      "kind": "dev",
+      "methods": {},
+      "version": 1
+    },
+    "userdoc": {
+      "kind": "user",
+      "methods": {},
+      "version": 1
+    }
+  },
+  "settings": {
+    "remappings": [
+      "forge-std/=lib/forge-std/src/"
+    ],
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    },
+    "compilationTarget": {
+      "src/FrontlineReputation.sol": "FrontlineReputation"
+    },
+    "evmVersion": "cancun",
+    "libraries": {}
+  },
+  "sources": {
+    "src/FrontlineReputation.sol": {
+      "keccak256": "0x52cb95af23dbd6cde656057d4774a3365b5f23aafc6356d6449cfe3dc50cb98d",
+      "license": "MIT",
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\n/// @title FrontlineReputation — On-chain portable credit score\n/// @notice Stores a simple reputation score (300–850), an on-time streak, and\n///         emits ledger events for each repayment. Only the protocol (owner)\n///         can record repayments; anyone can read scores.\ncontract FrontlineReputation {\n    struct Profile {\n        uint16 score;\n        uint16 onTimeStreak;\n        uint32 totalRepayments;\n        uint32 lateRepayments;\n    }\n\n    uint16 public constant MIN_SCORE = 300;\n    uint16 public constant MAX_SCORE = 850;\n    uint16 public constant INITIAL_SCORE = 656;\n    int16 public constant ON_TIME_DELTA = 18;\n    int16 public constant LATE_DELTA = -22;\n\n    address public owner;\n    mapping(address => Profile) public profiles;\n    mapping(address => bool) public authorizedCallers;\n\n    event RepaymentRecorded(address indexed user, uint256 indexed loanId, bool onTime, uint16 newScore, uint16 streak);\n    event AuthorizedCallerUpdated(address indexed caller, bool authorized);\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"not owner\");\n        _;\n    }\n\n    modifier onlyAuthorized() {\n        require(msg.sender == owner || authorizedCallers[msg.sender], \"not authorized\");\n        _;\n    }\n\n    constructor() {\n        owner = msg.sender;\n    }\n\n    function setAuthorizedCaller(address caller, bool authorized) external onlyOwner {\n        require(caller != address(0), \"zero address\");\n        authorizedCallers[caller] = authorized;\n        emit AuthorizedCallerUpdated(caller, authorized);\n    }\n\n    function recordRepayment(address user, uint256 loanId, bool onTime) external onlyAuthorized {\n        Profile storage p = profiles[user];\n        if (p.score == 0) p.score = INITIAL_SCORE;\n\n        p.totalRepayments++;\n        if (onTime) {\n            p.onTimeStreak++;\n            p.score = _clamp(int16(p.score) + ON_TIME_DELTA);\n        } else {\n            p.onTimeStreak = 0;\n            p.lateRepayments++;\n            p.score = _clamp(int16(p.score) + LATE_DELTA);\n        }\n\n        emit RepaymentRecorded(user, loanId, onTime, p.score, p.onTimeStreak);\n    }\n\n    function getProfile(address user) external view returns (Profile memory) {\n        Profile memory p = profiles[user];\n        if (p.score == 0) p.score = INITIAL_SCORE;\n        return p;\n    }\n\n    function tierOf(address user) external view returns (string memory) {\n        uint16 s = profiles[user].score;\n        if (s == 0) s = INITIAL_SCORE;\n        if (s < 560) return \"Recovering\";\n        if (s < 620) return \"Fair\";\n        if (s < 680) return \"Good\";\n        if (s < 740) return \"Strong\";\n        return \"Elite\";\n    }\n\n    function _clamp(int16 raw) internal pure returns (uint16) {\n        if (raw < int16(MIN_SCORE)) return MIN_SCORE;\n        if (raw > int16(MAX_SCORE)) return MAX_SCORE;\n        return uint16(raw);\n    }\n\n    function transferOwnership(address newOwner) external onlyOwner {\n        require(newOwner != address(0), \"zero address\");\n        owner = newOwner;\n    }\n}\n"
+    }
+  },
+  "version": 1
+}
