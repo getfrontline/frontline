@@ -6,6 +6,6 @@ export const metadata: Metadata = {
   description: "Associate FLT and buy from the Frontline bonding curve on Hedera testnet.",
 };
 
-export default function FaucetPage() {
+export default function TokenPage() {
   return <TokenView />;
 }

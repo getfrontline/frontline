@@ -22,11 +22,11 @@ export function DashboardHomeView() {
             <div>
               <p className="text-accent-amber text-sm font-bold uppercase tracking-wider">Wallet not connected</p>
               <p className="mt-2 text-sm text-[var(--text-secondary)]">
-                Connect your HashPack wallet to use the faucet, buy products, stake liquidity, and repay loans.
+                Connect your HashPack wallet to buy FLT from the curve, use checkout, stake liquidity, and repay loans.
               </p>
             </div>
             <Link
-              href="/dashboard/faucet"
+              href="/dashboard/token"
               className="bg-accent-mint text-surface-base hover:bg-accent-mint-dim shrink-0 rounded-full px-5 py-2.5 text-center text-xs font-bold uppercase tracking-wide"
             >
               Get started
@@ -45,17 +45,29 @@ export function DashboardHomeView() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Link
-          href="/dashboard/faucet"
+          href="/dashboard/profile"
           className="border-border bg-surface-card group rounded-2xl border p-5 transition-colors hover:border-[var(--accent-cyan)]/40"
         >
-          <p className="text-accent-cyan text-[10px] font-bold uppercase tracking-wider">Faucet</p>
+          <p className="text-accent-cyan text-[10px] font-bold uppercase tracking-wider">Profile</p>
+          <p className="font-display mt-2 text-lg font-bold text-[var(--text-primary)]">
+            {connected ? shortAddr(accountId ?? "") : "Wallet"}
+          </p>
+          <p className="text-muted mt-1 text-xs">HBAR + native HTS balances</p>
+          <p className="text-accent-cyan mt-3 text-xs font-semibold group-hover:underline">Open profile →</p>
+        </Link>
+
+        <Link
+          href="/dashboard/token"
+          className="border-border bg-surface-card group rounded-2xl border p-5 transition-colors hover:border-[var(--accent-cyan)]/40"
+        >
+          <p className="text-accent-cyan text-[10px] font-bold uppercase tracking-wider">Token</p>
           <p className="font-display mt-2 text-lg font-bold text-[var(--text-primary)]">
             {fmtFlt(state.walletBalanceFlt, 0)}
           </p>
-          <p className="text-muted mt-1 text-xs">Mint testnet FLT</p>
-          <p className="text-accent-cyan mt-3 text-xs font-semibold group-hover:underline">Drip tokens →</p>
+          <p className="text-muted mt-1 text-xs">Associate wallet and buy FLT</p>
+          <p className="text-accent-cyan mt-3 text-xs font-semibold group-hover:underline">Open token page →</p>
         </Link>
 
         <Link
@@ -108,6 +120,7 @@ export function DashboardHomeView() {
               { label: "Frontline Token", addr: CONTRACTS.flt },
               { label: "Frontline Pool", addr: CONTRACTS.pool },
               { label: "Reputation", addr: CONTRACTS.reputation },
+              { label: "Bonding Curve", addr: CONTRACTS.curve },
             ].map((c) => (
               <div key={c.label} className="flex items-center gap-3">
                 <dt className="text-[var(--text-secondary)]">{c.label}</dt>

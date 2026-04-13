@@ -3,12 +3,10 @@
 import {
   BNPL_FEE_BPS,
   REPAYMENT_DAYS,
-  type Product,
-  type Merchant,
   merchantById as staticMerchantById,
   productById as staticProductById,
 } from "@/lib/session/catalog";
-import { clampScore, tierFromScore } from "@/lib/session/reputation";
+import { tierFromScore } from "@/lib/session/reputation";
 import { fetchOnChainState, type OnChainState } from "@/lib/wallet/contract-reads";
 import { fetchChainCatalog, type ChainMerchant, type ChainProduct } from "@/lib/wallet/chain-catalog";
 import { useWallet } from "@/lib/wallet/hedera";
@@ -47,7 +45,7 @@ export type BnplLoan = {
 export type LedgerEvent = {
   id: string;
   at: number;
-  kind: "bnpl_opened" | "repayment" | "stake" | "unstake" | "faucet";
+  kind: "bnpl_opened" | "repayment" | "stake" | "unstake" | "token_buy";
   title: string;
   detail: string;
 };
@@ -120,7 +118,7 @@ type Action =
   | { type: "REPAY_LOAN"; loanId: string }
   | { type: "STAKE"; amount: number }
   | { type: "UNSTAKE"; amount: number }
-  | { type: "FAUCET_DRIP"; amount: number }
+  | { type: "TOKEN_BOUGHT"; amount: number }
   | { type: "SYNC_FROM_CHAIN"; data: OnChainState }
   | { type: "SYNC_CATALOG"; merchants: ChainMerchant[]; products: ChainProduct[] }
   | { type: "RESET_SESSION" };
@@ -353,14 +351,14 @@ function reduce(state: FrontlineSessionState, action: Action): FrontlineSessionS
         ],
       };
     }
-    case "FAUCET_DRIP": {
+    case "TOKEN_BOUGHT": {
       const amount = Math.max(0, action.amount);
       if (amount <= 0) return state;
       const now = Date.now();
       return {
         ...state,
         ledger: [
-          { id: `faucet-${now}`, at: now, kind: "faucet", title: "Faucet drip", detail: `+${amount.toLocaleString()} FLT` },
+          { id: `token-buy-${now}`, at: now, kind: "token_buy", title: "Curve purchase", detail: `+${amount.toLocaleString()} FLT` },
           ...state.ledger,
         ],
       };
@@ -411,7 +409,7 @@ type SessionContextValue = {
   repayLoan: (loanId: string) => void;
   stake: (amount: number) => void;
   unstake: (amount: number) => void;
-  faucetDrip: (amount: number) => void;
+  recordTokenBuy: (amount: number) => void;
   refreshFromChain: () => Promise<void>;
   refreshCatalog: () => Promise<void>;
   resetSession: () => void;
@@ -523,7 +521,7 @@ export function FrontlineSessionProvider({ children }: { children: ReactNode }) 
       repayLoan: (loanId) => dispatch({ type: "REPAY_LOAN", loanId }),
       stake: (amount) => dispatch({ type: "STAKE", amount }),
       unstake: (amount) => dispatch({ type: "UNSTAKE", amount }),
-      faucetDrip: (amount) => dispatch({ type: "FAUCET_DRIP", amount }),
+      recordTokenBuy: (amount) => dispatch({ type: "TOKEN_BOUGHT", amount }),
       refreshFromChain,
       refreshCatalog,
       resetSession: () => dispatch({ type: "RESET_SESSION" }),

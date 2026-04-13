@@ -2,16 +2,20 @@
 pragma solidity ^0.8.20;
 
 import {Test} from "forge-std/Test.sol";
+import {FrontlineBondingCurve} from "../src/FrontlineBondingCurve.sol";
 import {FrontlinePool} from "../src/FrontlinePool.sol";
 import {FrontlineReputation} from "../src/FrontlineReputation.sol";
 import {FrontlineToken} from "../src/FrontlineToken.sol";
 
 contract FrontlinePoolTest is Test {
+    uint256 internal constant BASE_PRICE_PER_TOKEN_WEI = 0.00002 ether;
+    uint256 internal constant CURVE_STEEPNESS_WAD = 2e18;
+
     FrontlineToken flt;
+    FrontlineBondingCurve curve;
     FrontlinePool pool;
     FrontlineReputation rep;
 
-    address owner = address(this);
     address lp1 = makeAddr("lp1");
     address lp2 = makeAddr("lp2");
     address payer = makeAddr("payer");
@@ -20,10 +24,13 @@ contract FrontlinePoolTest is Test {
 
     function setUp() public {
         flt = new FrontlineToken();
+        curve = new FrontlineBondingCurve(address(flt), BASE_PRICE_PER_TOKEN_WEI, CURVE_STEEPNESS_WAD);
         pool = new FrontlinePool(address(flt));
         rep = new FrontlineReputation();
 
-        // Wire reputation into pool
+        flt.setAuthorizedMinter(address(curve), true);
+        curve.activateCurve();
+
         pool.setReputation(address(rep));
         rep.setAuthorizedCaller(address(pool), true);
 
@@ -32,9 +39,9 @@ contract FrontlinePoolTest is Test {
         vm.prank(merVolt);
         pool.registerMerchant("Volt Street", "Electronics");
 
-        flt.mint(lp1, 500_000e8);
-        flt.mint(lp2, 300_000e8);
-        flt.mint(payer, 100_000e8);
+        _buyTokens(lp1, 20_000e8);
+        _buyTokens(lp2, 15_000e8);
+        _buyTokens(payer, 15_000e8);
 
         vm.prank(lp1);
         flt.approve(address(pool), type(uint256).max);
@@ -46,13 +53,20 @@ contract FrontlinePoolTest is Test {
 
     // --------------------------------------------------------- helpers
 
+    function _buyTokens(address buyer, uint256 tokenAmount) internal returns (uint256 costWei) {
+        costWei = curve.quoteBuyExactTokens(tokenAmount);
+        vm.deal(buyer, costWei + 1 ether);
+        vm.prank(buyer);
+        curve.buyExactTokens{value: costWei}(tokenAmount, costWei, buyer);
+    }
+
     function _openSingleLoan(uint256 amount) internal returns (uint256) {
-        address[] memory m = new address[](1);
-        m[0] = merNorth;
-        uint256[] memory a = new uint256[](1);
-        a[0] = amount;
+        address[] memory merchants = new address[](1);
+        merchants[0] = merNorth;
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = amount;
         vm.prank(payer);
-        return pool.openBnpl(m, a);
+        return pool.openBnpl(merchants, amounts);
     }
 
     // ===================================================== Merchant & Product registration
@@ -139,14 +153,14 @@ contract FrontlinePoolTest is Test {
 
     function test_stake_and_unstake() public {
         vm.prank(lp1);
-        pool.stake(100_000e8);
-        assertEq(pool.stakes(lp1), 100_000e8);
-        assertEq(pool.totalStaked(), 100_000e8);
+        pool.stake(10_000e8);
+        assertEq(pool.stakes(lp1), 10_000e8);
+        assertEq(pool.totalStaked(), 10_000e8);
 
         vm.prank(lp1);
-        pool.unstake(40_000e8);
-        assertEq(pool.stakes(lp1), 60_000e8);
-        assertEq(flt.balanceOf(lp1), 440_000e8);
+        pool.unstake(4_000e8);
+        assertEq(pool.stakes(lp1), 6_000e8);
+        assertEq(flt.balanceOf(lp1), 14_000e8);
     }
 
     function test_unstake_blocked_by_outstanding() public {
@@ -163,7 +177,7 @@ contract FrontlinePoolTest is Test {
 
     function test_bnpl_flow_two_merchants() public {
         vm.prank(lp1);
-        pool.stake(200_000e8);
+        pool.stake(20_000e8);
 
         address[] memory merchants = new address[](2);
         merchants[0] = merNorth;
@@ -196,7 +210,7 @@ contract FrontlinePoolTest is Test {
 
     function test_repay_on_time() public {
         vm.prank(lp1);
-        pool.stake(200_000e8);
+        pool.stake(20_000e8);
         uint256 lid = _openSingleLoan(1000e8);
 
         vm.prank(payer);
@@ -210,7 +224,7 @@ contract FrontlinePoolTest is Test {
 
     function test_repay_partial_then_full() public {
         vm.prank(lp1);
-        pool.stake(200_000e8);
+        pool.stake(20_000e8);
         uint256 lid = _openSingleLoan(1000e8);
 
         vm.prank(payer);
@@ -230,7 +244,7 @@ contract FrontlinePoolTest is Test {
 
     function test_late_repay_charges_fee() public {
         vm.prank(lp1);
-        pool.stake(200_000e8);
+        pool.stake(20_000e8);
         uint256 lid = _openSingleLoan(1000e8);
 
         vm.warp(block.timestamp + 8 days);
@@ -252,7 +266,7 @@ contract FrontlinePoolTest is Test {
 
     function test_late_fee_charged_only_once() public {
         vm.prank(lp1);
-        pool.stake(200_000e8);
+        pool.stake(20_000e8);
         uint256 lid = _openSingleLoan(1000e8);
 
         vm.warp(block.timestamp + 8 days);
@@ -276,7 +290,7 @@ contract FrontlinePoolTest is Test {
 
     function test_fee_split_lp_and_treasury() public {
         vm.prank(lp1);
-        pool.stake(100_000e8);
+        pool.stake(10_000e8);
 
         uint256 gross = 10_000e8;
         _openSingleLoan(gross);
@@ -291,9 +305,9 @@ contract FrontlinePoolTest is Test {
 
     function test_lp_yield_proportional_to_stake() public {
         vm.prank(lp1);
-        pool.stake(75_000e8);
+        pool.stake(7_500e8);
         vm.prank(lp2);
-        pool.stake(25_000e8);
+        pool.stake(2_500e8);
 
         uint256 gross = 10_000e8;
         _openSingleLoan(gross);
@@ -303,13 +317,13 @@ contract FrontlinePoolTest is Test {
 
         uint256 y1 = pool.lpPendingYield(lp1);
         uint256 y2 = pool.lpPendingYield(lp2);
-        assertApproxEqAbs(y1, (lpCut * 75_000e8) / 100_000e8, 1);
-        assertApproxEqAbs(y2, (lpCut * 25_000e8) / 100_000e8, 1);
+        assertApproxEqAbs(y1, (lpCut * 7_500e8) / 10_000e8, 1);
+        assertApproxEqAbs(y2, (lpCut * 2_500e8) / 10_000e8, 1);
     }
 
     function test_claim_yield() public {
         vm.prank(lp1);
-        pool.stake(100_000e8);
+        pool.stake(10_000e8);
         _openSingleLoan(10_000e8);
 
         uint256 pending = pool.lpPendingYield(lp1);
@@ -324,7 +338,7 @@ contract FrontlinePoolTest is Test {
 
     function test_late_fee_also_splits() public {
         vm.prank(lp1);
-        pool.stake(100_000e8);
+        pool.stake(10_000e8);
         uint256 lid = _openSingleLoan(1000e8);
 
         vm.warp(block.timestamp + 8 days);
@@ -343,7 +357,7 @@ contract FrontlinePoolTest is Test {
 
     function test_withdraw_treasury() public {
         vm.prank(lp1);
-        pool.stake(100_000e8);
+        pool.stake(10_000e8);
         _openSingleLoan(10_000e8);
 
         uint256 treasury = pool.protocolTreasury();
@@ -359,14 +373,14 @@ contract FrontlinePoolTest is Test {
 
     function test_merchant_withdraw() public {
         vm.prank(lp1);
-        pool.stake(200_000e8);
+        pool.stake(20_000e8);
 
-        address[] memory m = new address[](1);
-        m[0] = merNorth;
-        uint256[] memory a = new uint256[](1);
-        a[0] = 1000e8;
+        address[] memory merchants = new address[](1);
+        merchants[0] = merNorth;
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 1000e8;
         vm.prank(payer);
-        pool.openBnpl(m, a);
+        pool.openBnpl(merchants, amounts);
 
         uint256 bal = pool.merchantBalances(merNorth);
         assertTrue(bal > 0);
@@ -394,14 +408,14 @@ contract FrontlinePoolTest is Test {
         vm.prank(lp1);
         pool.stake(10_000e8);
 
-        address[] memory m = new address[](1);
-        m[0] = makeAddr("unknown");
-        uint256[] memory a = new uint256[](1);
-        a[0] = 100e8;
+        address[] memory merchants = new address[](1);
+        merchants[0] = makeAddr("unknown");
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 100e8;
 
         vm.prank(payer);
         vm.expectRevert("unregistered merchant");
-        pool.openBnpl(m, a);
+        pool.openBnpl(merchants, amounts);
     }
 
     // ===================================================== Reputation
@@ -429,14 +443,14 @@ contract FrontlinePoolTest is Test {
 
     function test_repay_on_time_updates_reputation() public {
         vm.prank(lp1);
-        pool.stake(200_000e8);
+        pool.stake(20_000e8);
         uint256 lid = _openSingleLoan(1000e8);
 
         vm.prank(payer);
         pool.repay(lid, 1000e8);
 
         FrontlineReputation.Profile memory p = rep.getProfile(payer);
-        assertEq(p.score, 674); // 656 + 18
+        assertEq(p.score, 674);
         assertEq(p.onTimeStreak, 1);
         assertEq(p.totalRepayments, 1);
         assertEq(p.lateRepayments, 0);
@@ -444,7 +458,7 @@ contract FrontlinePoolTest is Test {
 
     function test_repay_late_updates_reputation() public {
         vm.prank(lp1);
-        pool.stake(200_000e8);
+        pool.stake(20_000e8);
         uint256 lid = _openSingleLoan(1000e8);
 
         vm.warp(block.timestamp + 8 days);
@@ -453,32 +467,8 @@ contract FrontlinePoolTest is Test {
         pool.repay(lid, 1000e8);
 
         FrontlineReputation.Profile memory p = rep.getProfile(payer);
-        assertEq(p.score, 634); // 656 - 22
+        assertEq(p.score, 634);
         assertEq(p.onTimeStreak, 0);
         assertEq(p.lateRepayments, 1);
-    }
-
-    // ===================================================== FrontlineToken faucet
-
-    function test_faucet_drip() public {
-        address user = makeAddr("faucetUser");
-        vm.prank(user);
-        flt.faucet();
-        assertEq(flt.balanceOf(user), 10_000e8);
-    }
-
-    function test_faucet_cooldown() public {
-        address user = makeAddr("faucetUser");
-        vm.prank(user);
-        flt.faucet();
-
-        vm.prank(user);
-        vm.expectRevert("faucet cooldown");
-        flt.faucet();
-
-        vm.warp(block.timestamp + 1 hours);
-        vm.prank(user);
-        flt.faucet();
-        assertEq(flt.balanceOf(user), 20_000e8);
     }
 }

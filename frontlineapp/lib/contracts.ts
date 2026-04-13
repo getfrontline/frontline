@@ -2,6 +2,7 @@ export const CONTRACTS = {
   flt: process.env.NEXT_PUBLIC_FLT_TOKEN_ADDRESS ?? "",
   pool: process.env.NEXT_PUBLIC_FRONTLINE_POOL_ADDRESS ?? "",
   reputation: process.env.NEXT_PUBLIC_FRONTLINE_REPUTATION_ADDRESS ?? "",
+  curve: process.env.NEXT_PUBLIC_FRONTLINE_BONDING_CURVE_ADDRESS ?? "",
 } as const;
 
 export function shortAddr(addr: string): string {

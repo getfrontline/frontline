@@ -13,6 +13,14 @@ async function loadSdk() {
   return { ...sdk, Long: Long.default };
 }
 
+async function accountMirrorRecord(accountId: string) {
+  const res = await fetch(`https://testnet.mirrornode.hedera.com/api/v1/accounts/${accountId}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Mirror Node account lookup failed: ${res.status}`);
+  return res.json() as Promise<{ evm_address?: string }>;
+}
+
 function nodeIds(AccountId: typeof import("@hashgraph/sdk").AccountId) {
   return HEDERA_TESTNET_NODES.map((n) => AccountId.fromString(n));
 }
@@ -66,14 +74,38 @@ export async function buildAssociateFlt(userAccountId: string) {
     .freeze();
 }
 
-export async function buildFaucetDrip(userAccountId: string) {
-  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters } = await loadSdk();
-  if (!CONTRACTS.flt) throw new Error("FLT contract address not configured");
+export async function buildBuyCurveTokens(
+  userAccountId: string,
+  tokenAmountRaw: number | bigint,
+  maxCostTinybar: number | bigint,
+) {
+  const sdk = await loadSdk();
+  const {
+    ContractExecuteTransaction,
+    AccountId,
+    ContractId,
+    TransactionId,
+    ContractFunctionParameters,
+    Hbar,
+    Long,
+  } = sdk;
+  if (!CONTRACTS.curve) throw new Error("Bonding curve address not configured");
   const acctId = AccountId.fromString(userAccountId);
+  const mirrorAccount = await accountMirrorRecord(userAccountId);
+  const recipientAddr = mirrorAccount.evm_address
+    ? toSolidityAddr(AccountId, mirrorAccount.evm_address)
+    : toSolidityAddr(AccountId, userAccountId);
   return new ContractExecuteTransaction()
-    .setContractId(toContractId(ContractId, CONTRACTS.flt))
+    .setContractId(toContractId(ContractId, CONTRACTS.curve))
     .setGas(GAS)
-    .setFunction("faucet", new ContractFunctionParameters())
+    .setPayableAmount(Hbar.fromTinybars(toLong(Long, maxCostTinybar)))
+    .setFunction(
+      "buyExactTokens",
+      new ContractFunctionParameters()
+        .addUint256(toLong(Long, tokenAmountRaw))
+        .addUint256(toLong(Long, maxCostTinybar))
+        .addAddress(recipientAddr),
+    )
     .setNodeAccountIds(nodeIds(AccountId))
     .setTransactionId(TransactionId.generate(acctId))
     .freeze();

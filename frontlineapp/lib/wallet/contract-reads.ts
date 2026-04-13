@@ -2,6 +2,8 @@ import { CONTRACTS } from "@/lib/contracts";
 import { FLT_DECIMALS } from "@/lib/session/catalog";
 
 const MIRROR_RPC = "https://testnet.hashio.io/api";
+const MIRROR_NODE_REST = "https://testnet.mirrornode.hedera.com/api/v1";
+const contractAddressCache = new Map<string, string>();
 
 const SELECTORS: Record<string, string> = {
   "balanceOf(address)": "70a08231",
@@ -13,6 +15,10 @@ const SELECTORS: Record<string, string> = {
   "registeredMerchants(address)": "f101b9cc",
   "availableLiquidity()": "74375359",
   "getProfile(address)": "0f53a470",
+  "currentLiquidity()": "46caf2ae",
+  "soldSupply()": "fa2299ee",
+  "spotPricePerTokenWei()": "a2053b8c",
+  "quoteBuyExactTokens(uint256)": "af769545",
 };
 
 function sel(sig: string): string {
@@ -24,12 +30,12 @@ function padAddress(addr: string): string {
   return clean.toLowerCase().padStart(64, "0");
 }
 
-function padUint256(n: number): string {
-  return n.toString(16).padStart(64, "0");
+function padUint256(n: number | bigint): string {
+  return BigInt(n).toString(16).padStart(64, "0");
 }
 
 async function ethCall(to: string, data: string): Promise<string> {
-  const toAddr = to.startsWith("0x") ? to : `0x${to}`;
+  const toAddr = await normalizeContractAddress(to);
   const res = await fetch(MIRROR_RPC, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -43,6 +49,19 @@ async function ethCall(to: string, data: string): Promise<string> {
   const json = await res.json();
   if (json.error) throw new Error(json.error.message);
   return json.result as string;
+}
+
+async function normalizeContractAddress(addr: string): Promise<string> {
+  if (addr.startsWith("0x")) return addr;
+  const cached = contractAddressCache.get(addr);
+  if (cached) return cached;
+
+  const res = await fetch(`${MIRROR_NODE_REST}/contracts/${addr}`);
+  const json = await res.json();
+  const evmAddress = json.evm_address as string | undefined;
+  if (!evmAddress) throw new Error(`Could not resolve EVM address for contract ${addr}`);
+  contractAddressCache.set(addr, evmAddress);
+  return evmAddress;
 }
 
 function decodeUint256(hex: string): bigint {
@@ -76,6 +95,12 @@ export type OnChainState = {
   lateRepayments: number;
   isMerchant: boolean;
   merchantBalanceFlt: number;
+};
+
+export type TokenStats = {
+  curveLiquidityFlt: number;
+  soldSupplyFlt: number;
+  spotPriceHbar: number;
 };
 
 export async function fetchOnChainState(accountId: string): Promise<OnChainState> {
@@ -157,4 +182,38 @@ export async function fetchOnChainState(accountId: string): Promise<OnChainState
     isMerchant: isMerchantRaw !== 0n,
     merchantBalanceFlt: rawToFlt(decodeUint256(val(8))),
   };
+}
+
+function rawToHbar(raw: bigint): number {
+  return Number(raw) / 1e8;
+}
+
+export async function fetchTokenStats(): Promise<TokenStats> {
+  if (!CONTRACTS.curve) {
+    return {
+      curveLiquidityFlt: 0,
+      soldSupplyFlt: 0,
+      spotPriceHbar: 0,
+    };
+  }
+
+  const oneTokenRaw = BigInt(10 ** FLT_DECIMALS);
+  const [liquidityHex, soldHex, spotHex] = await Promise.all([
+    ethCall(CONTRACTS.curve, sel("currentLiquidity()")),
+    ethCall(CONTRACTS.curve, sel("soldSupply()")),
+    ethCall(CONTRACTS.curve, sel("quoteBuyExactTokens(uint256)") + padUint256(oneTokenRaw)),
+  ]);
+
+  return {
+    curveLiquidityFlt: rawToFlt(decodeUint256(liquidityHex)),
+    soldSupplyFlt: rawToFlt(decodeUint256(soldHex)),
+    spotPriceHbar: rawToHbar(decodeUint256(spotHex)),
+  };
+}
+
+export async function quoteCurveBuyExactTokens(tokenAmountRaw: bigint): Promise<bigint> {
+  if (!CONTRACTS.curve) throw new Error("Bonding curve address not configured");
+  return decodeUint256(
+    await ethCall(CONTRACTS.curve, sel("quoteBuyExactTokens(uint256)") + padUint256(tokenAmountRaw)),
+  );
 }

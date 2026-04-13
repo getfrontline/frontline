@@ -176,7 +176,7 @@ export function ReputationView() {
                 <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${
                   ev.kind === "repayment" ? "bg-[var(--accent-mint)]"
                     : ev.kind === "bnpl_opened" ? "bg-[var(--accent-amber)]"
-                    : ev.kind === "faucet" ? "bg-[var(--accent-cyan)]"
+                    : ev.kind === "token_buy" ? "bg-[var(--accent-cyan)]"
                     : "bg-[var(--text-muted)]"
                 }`} />
                 <div className="min-w-0 flex-1">

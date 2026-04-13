@@ -6,7 +6,8 @@ import { ConnectWalletButton } from "@/components/wallet/ConnectWalletButton";
 
 const WORKSPACE_LINKS = [
   { href: "/dashboard", label: "Overview", exact: true },
-  { href: "/dashboard/faucet", label: "Faucet", exact: false },
+  { href: "/dashboard/profile", label: "Profile", exact: false },
+  { href: "/dashboard/token", label: "Token", exact: false },
   { href: "/dashboard/register", label: "Register", exact: false },
   { href: "/dashboard/marketplace", label: "Merchants", exact: false },
   { href: "/dashboard/checkout", label: "Pay", exact: false },
