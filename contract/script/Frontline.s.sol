@@ -15,9 +15,6 @@ contract FrontlineScript is Script {
     function run() public {
         uint256 privateKey = vm.envUint("PRIVATE_KEY");
         address deployer = vm.addr(privateKey);
-        address demoMerchant = _envOrAddress("DEMO_MERCHANT_EVM_ADDRESS", deployer);
-        string memory demoMerchantName = _envOrString("DEMO_MERCHANT_NAME", "Demo Merchant");
-        string memory demoMerchantCategory = _envOrString("DEMO_MERCHANT_CATEGORY", "Mainnet merchant");
         uint256 basePricePerTokenWei =
             _envOrUint("CURVE_BASE_PRICE_PER_TOKEN_TINYBAR", DEFAULT_BASE_PRICE_PER_TOKEN_TINYBAR);
         uint256 curveSteepnessWad = _envOrUint("CURVE_STEEPNESS_WAD", DEFAULT_CURVE_STEEPNESS_WAD);
@@ -45,10 +42,7 @@ contract FrontlineScript is Script {
         console.log("Curve activated with FLT liquidity:", curve.currentLiquidity());
 
         _bootstrapPool(curve, flt, pool, deployer, poolSeedTokens);
-        _registerMerchant(pool, demoMerchant, demoMerchantName, demoMerchantCategory);
-
         console.log("Merchant count:", pool.merchantCount());
-        console.log("Demo merchant active:", pool.registeredMerchants(demoMerchant));
 
         vm.stopBroadcast();
 
@@ -58,17 +52,6 @@ contract FrontlineScript is Script {
         console.log("  NEXT_PUBLIC_FRONTLINE_POOL_ADDRESS=", address(pool));
         console.log("  NEXT_PUBLIC_FRONTLINE_REPUTATION_ADDRESS=", address(rep));
         console.log("  NEXT_PUBLIC_FRONTLINE_BONDING_CURVE_ADDRESS=", address(curve));
-        console.log("  NEXT_PUBLIC_MERCHANT_NORTH_ADDRESS=", demoMerchant);
-        console.log("  NEXT_PUBLIC_MERCHANT_PARCEL_ADDRESS=", demoMerchant);
-        console.log("  NEXT_PUBLIC_MERCHANT_VOLT_ADDRESS=", demoMerchant);
-    }
-
-    function _envOrAddress(string memory key, address fallbackValue) internal view returns (address) {
-        try vm.envAddress(key) returns (address value) {
-            return value;
-        } catch {
-            return fallbackValue;
-        }
     }
 
     function _envOrString(string memory key, string memory fallbackValue) internal view returns (string memory) {
@@ -85,16 +68,6 @@ contract FrontlineScript is Script {
         } catch {
             return fallbackValue;
         }
-    }
-
-    function _registerMerchant(
-        FrontlinePool pool,
-        address demoMerchant,
-        string memory demoMerchantName,
-        string memory demoMerchantCategory
-    ) internal {
-        pool.registerMerchantFor(demoMerchant, demoMerchantName, demoMerchantCategory);
-        console.log("Demo merchant registered:", demoMerchant);
     }
 
     function _bootstrapPool(

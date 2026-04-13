@@ -1,8 +1,9 @@
 import { CONTRACTS } from "@/lib/contracts";
 import { FLT_DECIMALS } from "@/lib/session/catalog";
+import { HEDERA_MIRROR_NODE_URL, HEDERA_RPC_URL } from "@/lib/wallet/network-config";
 
-const MIRROR_RPC = "https://testnet.hashio.io/api";
-const MIRROR_NODE_REST = "https://testnet.mirrornode.hedera.com/api/v1";
+const MIRROR_RPC = HEDERA_RPC_URL;
+const MIRROR_NODE_REST = HEDERA_MIRROR_NODE_URL;
 const contractAddressCache = new Map<string, string>();
 
 const SELECTORS: Record<string, string> = {
@@ -76,7 +77,7 @@ function rawToFlt(raw: bigint): number {
 
 async function accountToEvm(accountId: string): Promise<string> {
   const res = await fetch(
-    `https://testnet.mirrornode.hedera.com/api/v1/accounts/${accountId}`,
+    `${MIRROR_NODE_REST}/accounts/${accountId}`,
   );
   const json = await res.json();
   return (json.evm_address as string) ?? "";

@@ -6,6 +6,11 @@
   "output": {
     "abi": [
       {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
         "inputs": [
           {
             "internalType": "address",
@@ -34,19 +39,38 @@
         "inputs": [
           {
             "internalType": "address",
-            "name": "to",
+            "name": "minter",
             "type": "address",
             "indexed": true
           },
           {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256",
+            "internalType": "bool",
+            "name": "authorized",
+            "type": "bool",
             "indexed": false
           }
         ],
         "type": "event",
-        "name": "FaucetDrip",
+        "name": "AuthorizedMinterUpdated",
+        "anonymous": false
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "previousOwner",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address",
+            "indexed": true
+          }
+        ],
+        "type": "event",
+        "name": "OwnershipTransferred",
         "anonymous": false
       },
       {
@@ -73,32 +97,6 @@
         "type": "event",
         "name": "Transfer",
         "anonymous": false
-      },
-      {
-        "inputs": [],
-        "stateMutability": "view",
-        "type": "function",
-        "name": "FAUCET_AMOUNT",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "inputs": [],
-        "stateMutability": "view",
-        "type": "function",
-        "name": "FAUCET_COOLDOWN",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ]
       },
       {
         "inputs": [
@@ -158,6 +156,25 @@
         ],
         "stateMutability": "view",
         "type": "function",
+        "name": "authorizedMinters",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
         "name": "balanceOf",
         "outputs": [
           {
@@ -177,31 +194,6 @@
             "internalType": "uint8",
             "name": "",
             "type": "uint8"
-          }
-        ]
-      },
-      {
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function",
-        "name": "faucet"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function",
-        "name": "lastFaucetDrip",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
           }
         ]
       },
@@ -234,6 +226,36 @@
             "type": "string"
           }
         ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "owner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "minter",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "authorized",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "name": "setAuthorizedMinter"
       },
       {
         "inputs": [],
@@ -313,6 +335,18 @@
             "type": "bool"
           }
         ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "name": "transferOwnership"
       }
     ],
     "devdoc": {
@@ -338,12 +372,6 @@
         },
         "decimals()": {
           "notice": "Returns the decimals places of the token."
-        },
-        "faucet()": {
-          "notice": "Open faucet — anyone can call once per cooldown period."
-        },
-        "mint(address,uint256)": {
-          "notice": "Unrestricted mint for contract-level setup and testing."
         },
         "name()": {
           "notice": "Returns the name of the token."
@@ -388,9 +416,9 @@
       "content": "// SPDX-License-Identifier: MIT OR Apache-2.0\npragma solidity >=0.8.13 <0.9.0;\n\n/// @dev Interface of the ERC20 standard as defined in the EIP.\n/// @dev This includes the optional name, symbol, and decimals metadata.\ninterface IERC20 {\n    /// @dev Emitted when `value` tokens are moved from one account (`from`) to another (`to`).\n    event Transfer(address indexed from, address indexed to, uint256 value);\n\n    /// @dev Emitted when the allowance of a `spender` for an `owner` is set, where `value`\n    /// is the new allowance.\n    event Approval(address indexed owner, address indexed spender, uint256 value);\n\n    /// @notice Returns the amount of tokens in existence.\n    function totalSupply() external view returns (uint256);\n\n    /// @notice Returns the amount of tokens owned by `account`.\n    function balanceOf(address account) external view returns (uint256);\n\n    /// @notice Moves `amount` tokens from the caller's account to `to`.\n    function transfer(address to, uint256 amount) external returns (bool);\n\n    /// @notice Returns the remaining number of tokens that `spender` is allowed\n    /// to spend on behalf of `owner`\n    function allowance(address owner, address spender) external view returns (uint256);\n\n    /// @notice Sets `amount` as the allowance of `spender` over the caller's tokens.\n    /// @dev Be aware of front-running risks: https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\n    function approve(address spender, uint256 amount) external returns (bool);\n\n    /// @notice Moves `amount` tokens from `from` to `to` using the allowance mechanism.\n    /// `amount` is then deducted from the caller's allowance.\n    function transferFrom(address from, address to, uint256 amount) external returns (bool);\n\n    /// @notice Returns the name of the token.\n    function name() external view returns (string memory);\n\n    /// @notice Returns the symbol of the token.\n    function symbol() external view returns (string memory);\n\n    /// @notice Returns the decimals places of the token.\n    function decimals() external view returns (uint8);\n}\n"
     },
     "src/FrontlineToken.sol": {
-      "keccak256": "0x47ecaa700430ff76e012af46510c2d82f5d1d6387e42aa51998599619dfa729a",
+      "keccak256": "0xa2d5eb4bed85f52e81a2e887e57a28b7eeb68c0cf24ae9f24f168cba142268a7",
       "license": "MIT",
-      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport {IERC20} from \"forge-std/interfaces/IERC20.sol\";\n\n/// @title FrontlineToken (FLT) — Testnet token used across the Frontline protocol\n/// @notice ERC-20 with a public faucet `mint()`. Designed for Hedera testnet use;\n///         on mainnet this would be replaced by USDC via HTS association.\ncontract FrontlineToken is IERC20 {\n    string public constant name = \"Frontline Token\";\n    string public constant symbol = \"FLT\";\n    uint8 public constant decimals = 8;\n\n    uint256 public constant FAUCET_AMOUNT = 10_000 * 10 ** 8; // 10,000 FLT per drip\n    uint256 public constant FAUCET_COOLDOWN = 1 hours;\n\n    uint256 public totalSupply;\n    mapping(address => uint256) public balanceOf;\n    mapping(address => mapping(address => uint256)) public allowance;\n    mapping(address => uint256) public lastFaucetDrip;\n\n    event FaucetDrip(address indexed to, uint256 amount);\n\n    /// @notice Open faucet — anyone can call once per cooldown period.\n    function faucet() external {\n        require(\n            lastFaucetDrip[msg.sender] == 0 || block.timestamp >= lastFaucetDrip[msg.sender] + FAUCET_COOLDOWN,\n            \"faucet cooldown\"\n        );\n        lastFaucetDrip[msg.sender] = block.timestamp;\n        _mint(msg.sender, FAUCET_AMOUNT);\n        emit FaucetDrip(msg.sender, FAUCET_AMOUNT);\n    }\n\n    /// @notice Unrestricted mint for contract-level setup and testing.\n    function mint(address to, uint256 amount) external {\n        _mint(to, amount);\n    }\n\n    function approve(address spender, uint256 amount) external returns (bool) {\n        allowance[msg.sender][spender] = amount;\n        emit Approval(msg.sender, spender, amount);\n        return true;\n    }\n\n    function transfer(address to, uint256 amount) external returns (bool) {\n        require(balanceOf[msg.sender] >= amount, \"insufficient balance\");\n        balanceOf[msg.sender] -= amount;\n        balanceOf[to] += amount;\n        emit Transfer(msg.sender, to, amount);\n        return true;\n    }\n\n    function transferFrom(address from, address to, uint256 amount) external returns (bool) {\n        require(balanceOf[from] >= amount, \"insufficient balance\");\n        if (allowance[from][msg.sender] != type(uint256).max) {\n            require(allowance[from][msg.sender] >= amount, \"insufficient allowance\");\n            allowance[from][msg.sender] -= amount;\n        }\n        balanceOf[from] -= amount;\n        balanceOf[to] += amount;\n        emit Transfer(from, to, amount);\n        return true;\n    }\n\n    function _mint(address to, uint256 amount) internal {\n        balanceOf[to] += amount;\n        totalSupply += amount;\n        emit Transfer(address(0), to, amount);\n    }\n}\n"
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport {IERC20} from \"forge-std/interfaces/IERC20.sol\";\n\n/// @title FrontlineToken (FLT) — mainnet-oriented protocol token\n/// @notice Faucet minting is disabled. New issuance is restricted to\n///         explicitly authorized contracts such as the bonding curve.\ncontract FrontlineToken is IERC20 {\n    string public constant name = \"Frontline Token\";\n    string public constant symbol = \"FLT\";\n    uint8 public constant decimals = 8;\n\n    address public owner;\n    uint256 public totalSupply;\n    mapping(address => uint256) public balanceOf;\n    mapping(address => mapping(address => uint256)) public allowance;\n    mapping(address => bool) public authorizedMinters;\n\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\n    event AuthorizedMinterUpdated(address indexed minter, bool authorized);\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"not owner\");\n        _;\n    }\n\n    modifier onlyAuthorizedMinter() {\n        require(authorizedMinters[msg.sender], \"not authorized minter\");\n        _;\n    }\n\n    constructor() {\n        owner = msg.sender;\n        emit OwnershipTransferred(address(0), msg.sender);\n    }\n\n    function setAuthorizedMinter(address minter, bool authorized) external onlyOwner {\n        require(minter != address(0), \"zero address\");\n        authorizedMinters[minter] = authorized;\n        emit AuthorizedMinterUpdated(minter, authorized);\n    }\n\n    function transferOwnership(address newOwner) external onlyOwner {\n        require(newOwner != address(0), \"zero address\");\n        emit OwnershipTransferred(owner, newOwner);\n        owner = newOwner;\n    }\n\n    function mint(address to, uint256 amount) external onlyAuthorizedMinter {\n        require(to != address(0), \"zero address\");\n        _mint(to, amount);\n    }\n\n    function approve(address spender, uint256 amount) external returns (bool) {\n        allowance[msg.sender][spender] = amount;\n        emit Approval(msg.sender, spender, amount);\n        return true;\n    }\n\n    function transfer(address to, uint256 amount) external returns (bool) {\n        _transfer(msg.sender, to, amount);\n        return true;\n    }\n\n    function transferFrom(address from, address to, uint256 amount) external returns (bool) {\n        require(balanceOf[from] >= amount, \"insufficient balance\");\n        if (allowance[from][msg.sender] != type(uint256).max) {\n            require(allowance[from][msg.sender] >= amount, \"insufficient allowance\");\n            allowance[from][msg.sender] -= amount;\n        }\n        _transfer(from, to, amount);\n        return true;\n    }\n\n    function _transfer(address from, address to, uint256 amount) internal {\n        require(to != address(0), \"zero address\");\n        require(balanceOf[from] >= amount, \"insufficient balance\");\n        balanceOf[from] -= amount;\n        balanceOf[to] += amount;\n        emit Transfer(from, to, amount);\n    }\n\n    function _mint(address to, uint256 amount) internal {\n        balanceOf[to] += amount;\n        totalSupply += amount;\n        emit Transfer(address(0), to, amount);\n    }\n}\n"
     }
   },
   "version": 1

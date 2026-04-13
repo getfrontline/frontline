@@ -2,23 +2,23 @@ HashScan Verify Upload Guide
 ============================
 Detected System: Foundry
 
-- Counter
-  File: verify-bundles/Counter/metadata.json
-  Address: <set env COUNTER_ADDRESS or pass Counter=0xAddress>
+- FrontlineToken
+  File: verify-bundles/FrontlineToken/metadata.json
+  Address: 0x00000000000000000000000000000000009f2da2
   Upload to: https://hashscan.io/<networkType>/contract/<address> -> Verify
 
 - FrontlinePool
   File: verify-bundles/FrontlinePool/metadata.json
-  Address: <set env FRONTLINEPOOL_ADDRESS or pass FrontlinePool=0xAddress>
+  Address: 0x00000000000000000000000000000000009f2da5
   Upload to: https://hashscan.io/<networkType>/contract/<address> -> Verify
 
 - FrontlineReputation
   File: verify-bundles/FrontlineReputation/metadata.json
-  Address: <set env FRONTLINEREPUTATION_ADDRESS or pass FrontlineReputation=0xAddress>
+  Address: 0x00000000000000000000000000000000009f2da7
   Upload to: https://hashscan.io/<networkType>/contract/<address> -> Verify
 
-- FrontlineToken
-  File: verify-bundles/FrontlineToken/metadata.json
-  Address: <set env FRONTLINETOKEN_ADDRESS or pass FrontlineToken=0xAddress>
+- FrontlineBondingCurve
+  File: verify-bundles/FrontlineBondingCurve/metadata.json
+  Address: 0x00000000000000000000000000000000009f2daa
   Upload to: https://hashscan.io/<networkType>/contract/<address> -> Verify
 

@@ -10,6 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { HEDERA_NETWORK } from "@/lib/wallet/network-config";
 
 export type WalletStatus = "disconnected" | "initializing" | "ready" | "connecting" | "connected" | "no-project-id";
 
@@ -31,7 +32,7 @@ type WalletContextValue = WalletState & {
 const WalletContext = createContext<WalletContextValue>({
   status: "disconnected",
   accountId: null,
-  network: "testnet",
+  network: HEDERA_NETWORK,
   connect: async () => {},
   disconnect: async () => {},
   sendTx: async () => {},
@@ -43,7 +44,7 @@ const WC_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? "";
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<WalletStatus>("disconnected");
   const [accountId, setAccountId] = useState<string | null>(null);
-  const [network] = useState("testnet");
+  const [network] = useState(HEDERA_NETWORK);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const hcRef = useRef<any>(null);
   const initPromiseRef = useRef<Promise<void> | null>(null);
@@ -83,7 +84,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           url: window.location.origin,
         };
 
-        const hc = new HashConnect(LedgerId.TESTNET, WC_PROJECT_ID, appMetadata, true);
+        const ledgerId = HEDERA_NETWORK === "mainnet" ? LedgerId.MAINNET : LedgerId.TESTNET;
+        const hc = new HashConnect(ledgerId, WC_PROJECT_ID, appMetadata, true);
         hcRef.current = hc;
 
         hc.pairingEvent.on((data: { accountIds?: string[] }) => {

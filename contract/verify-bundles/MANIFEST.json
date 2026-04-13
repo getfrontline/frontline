@@ -1,0 +1,37 @@
+{
+  "network": "hedera-mainnet",
+  "deployer": {
+    "accountId": "0.0.10431781",
+    "evmAddress": "0x31ec9a87e446e8a747431e8657609793d241166a"
+  },
+  "contracts": [
+    {
+      "name": "FrontlineToken",
+      "hederaContractId": "0.0.10431906",
+      "evmAddress": "0x00000000000000000000000000000000009f2da2",
+      "metadataPath": "verify-bundles/FrontlineToken/metadata.json",
+      "hashscanVerifyUrl": "https://hashscan.io/mainnet/contract/0x00000000000000000000000000000000009f2da2"
+    },
+    {
+      "name": "FrontlinePool",
+      "hederaContractId": "0.0.10431909",
+      "evmAddress": "0x00000000000000000000000000000000009f2da5",
+      "metadataPath": "verify-bundles/FrontlinePool/metadata.json",
+      "hashscanVerifyUrl": "https://hashscan.io/mainnet/contract/0x00000000000000000000000000000000009f2da5"
+    },
+    {
+      "name": "FrontlineReputation",
+      "hederaContractId": "0.0.10431911",
+      "evmAddress": "0x00000000000000000000000000000000009f2da7",
+      "metadataPath": "verify-bundles/FrontlineReputation/metadata.json",
+      "hashscanVerifyUrl": "https://hashscan.io/mainnet/contract/0x00000000000000000000000000000000009f2da7"
+    },
+    {
+      "name": "FrontlineBondingCurve",
+      "hederaContractId": "0.0.10431914",
+      "evmAddress": "0x00000000000000000000000000000000009f2daa",
+      "metadataPath": "verify-bundles/FrontlineBondingCurve/metadata.json",
+      "hashscanVerifyUrl": "https://hashscan.io/mainnet/contract/0x00000000000000000000000000000000009f2daa"
+    }
+  ]
+}

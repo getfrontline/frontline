@@ -1,6 +1,6 @@
 import { CONTRACTS } from "@/lib/contracts";
+import { HEDERA_MIRROR_NODE_URL, HEDERA_NODE_IDS } from "@/lib/wallet/network-config";
 
-const HEDERA_TESTNET_NODES = ["0.0.3", "0.0.4", "0.0.5"];
 const GAS = 300_000;
 const REGISTER_GAS = 1_000_000;
 const BNPL_GAS = 1_000_000;
@@ -14,7 +14,7 @@ async function loadSdk() {
 }
 
 async function accountMirrorRecord(accountId: string) {
-  const res = await fetch(`https://testnet.mirrornode.hedera.com/api/v1/accounts/${accountId}`, {
+  const res = await fetch(`${HEDERA_MIRROR_NODE_URL}/accounts/${accountId}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error(`Mirror Node account lookup failed: ${res.status}`);
@@ -22,7 +22,7 @@ async function accountMirrorRecord(accountId: string) {
 }
 
 function nodeIds(AccountId: typeof import("@hashgraph/sdk").AccountId) {
-  return HEDERA_TESTNET_NODES.map((n) => AccountId.fromString(n));
+  return HEDERA_NODE_IDS.map((n) => AccountId.fromString(n));
 }
 
 function toLong(Long: typeof import("long").default, n: number | bigint): import("long").default {

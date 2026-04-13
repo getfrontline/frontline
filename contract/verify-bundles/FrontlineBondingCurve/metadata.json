@@ -1,0 +1,495 @@
+{
+  "compiler": {
+    "version": "0.8.24+commit.e11b9ed9"
+  },
+  "language": "Solidity",
+  "output": {
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "initialBasePricePerTokenWei",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "initialCurveSteepnessWad",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenAmount",
+            "type": "uint256",
+            "indexed": false
+          }
+        ],
+        "type": "event",
+        "name": "BootstrapAllocated",
+        "anonymous": false
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "tokenLiquidity",
+            "type": "uint256",
+            "indexed": false
+          }
+        ],
+        "type": "event",
+        "name": "CurveActivated",
+        "anonymous": false
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "previousOwner",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address",
+            "indexed": true
+          }
+        ],
+        "type": "event",
+        "name": "OwnershipTransferred",
+        "anonymous": false
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "buyer",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenAmount",
+            "type": "uint256",
+            "indexed": false
+          },
+          {
+            "internalType": "uint256",
+            "name": "costWei",
+            "type": "uint256",
+            "indexed": false
+          },
+          {
+            "internalType": "uint256",
+            "name": "refundWei",
+            "type": "uint256",
+            "indexed": false
+          }
+        ],
+        "type": "event",
+        "name": "TokensPurchased",
+        "anonymous": false
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "seller",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address",
+            "indexed": true
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenAmount",
+            "type": "uint256",
+            "indexed": false
+          },
+          {
+            "internalType": "uint256",
+            "name": "payoutWei",
+            "type": "uint256",
+            "indexed": false
+          }
+        ],
+        "type": "event",
+        "name": "TokensSold",
+        "anonymous": false
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "INITIAL_LAUNCH_SUPPLY",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "TOKEN_SCALE",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "WAD",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "name": "activateCurve"
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "basePricePerTokenWei",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenAmount",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "name": "bootstrapAllocation"
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "bootstrapDistributed",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "tokenAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxCostWei",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "payable",
+        "type": "function",
+        "name": "buyExactTokens",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "costWei",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "currentLiquidity",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "curveActive",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "curveSteepnessWad",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "owner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "tokenAmount",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "quoteBuyExactTokens",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "tokenAmount",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "quoteSellExactTokens",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "tokenAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minPayoutWei",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address payable",
+            "name": "recipient",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "name": "sellExactTokens",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "payoutWei",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "soldSupply",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "spotPricePerTokenWei",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "spotPricePerUnitWei",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "name": "token",
+        "outputs": [
+          {
+            "internalType": "contract FrontlineToken",
+            "name": "",
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "name": "transferOwnership"
+      }
+    ],
+    "devdoc": {
+      "kind": "dev",
+      "methods": {},
+      "version": 1
+    },
+    "userdoc": {
+      "kind": "user",
+      "methods": {},
+      "version": 1
+    }
+  },
+  "settings": {
+    "remappings": [
+      "forge-std/=lib/forge-std/src/"
+    ],
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    },
+    "compilationTarget": {
+      "src/FrontlineBondingCurve.sol": "FrontlineBondingCurve"
+    },
+    "evmVersion": "cancun",
+    "libraries": {}
+  },
+  "sources": {
+    "lib/forge-std/src/interfaces/IERC20.sol": {
+      "keccak256": "0x5945813ecc305238ca86d7a211a52f300e41173e34d39166f99758a857717dec",
+      "license": "MIT OR Apache-2.0",
+      "content": "// SPDX-License-Identifier: MIT OR Apache-2.0\npragma solidity >=0.8.13 <0.9.0;\n\n/// @dev Interface of the ERC20 standard as defined in the EIP.\n/// @dev This includes the optional name, symbol, and decimals metadata.\ninterface IERC20 {\n    /// @dev Emitted when `value` tokens are moved from one account (`from`) to another (`to`).\n    event Transfer(address indexed from, address indexed to, uint256 value);\n\n    /// @dev Emitted when the allowance of a `spender` for an `owner` is set, where `value`\n    /// is the new allowance.\n    event Approval(address indexed owner, address indexed spender, uint256 value);\n\n    /// @notice Returns the amount of tokens in existence.\n    function totalSupply() external view returns (uint256);\n\n    /// @notice Returns the amount of tokens owned by `account`.\n    function balanceOf(address account) external view returns (uint256);\n\n    /// @notice Moves `amount` tokens from the caller's account to `to`.\n    function transfer(address to, uint256 amount) external returns (bool);\n\n    /// @notice Returns the remaining number of tokens that `spender` is allowed\n    /// to spend on behalf of `owner`\n    function allowance(address owner, address spender) external view returns (uint256);\n\n    /// @notice Sets `amount` as the allowance of `spender` over the caller's tokens.\n    /// @dev Be aware of front-running risks: https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\n    function approve(address spender, uint256 amount) external returns (bool);\n\n    /// @notice Moves `amount` tokens from `from` to `to` using the allowance mechanism.\n    /// `amount` is then deducted from the caller's allowance.\n    function transferFrom(address from, address to, uint256 amount) external returns (bool);\n\n    /// @notice Returns the name of the token.\n    function name() external view returns (string memory);\n\n    /// @notice Returns the symbol of the token.\n    function symbol() external view returns (string memory);\n\n    /// @notice Returns the decimals places of the token.\n    function decimals() external view returns (uint8);\n}\n"
+    },
+    "src/FrontlineBondingCurve.sol": {
+      "keccak256": "0x4a75a10676907c836d88456e9abe60224cc3fb50eee865fae2bb89f45f4d3d23",
+      "license": "MIT",
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport {FrontlineToken} from \"./FrontlineToken.sol\";\n\n/// @title FrontlineBondingCurve\n/// @notice Mainnet-oriented issuance path for FLT. The curve mints a one-time\n///         launch inventory of 1,000,000,000 FLT to itself, supports an\n///         owner-controlled bootstrap allocation for initial protocol seeding,\n///         then sells and buys back against native HBAR using an exponential\n///         liquidity curve.\ncontract FrontlineBondingCurve {\n    uint256 public constant WAD = 1e18;\n    uint256 public constant TOKEN_SCALE = 1e8;\n    uint256 public constant INITIAL_LAUNCH_SUPPLY = 1_000_000_000 * TOKEN_SCALE;\n    uint256 internal constant MAX_EXPONENT_WAD = 8e18;\n    uint256 internal constant RANGE_REDUCTION_THRESHOLD_WAD = 5e17;\n    uint256 internal constant MAX_TAYLOR_TERMS = 16;\n\n    FrontlineToken public immutable token;\n    address public owner;\n    uint256 public immutable basePricePerTokenWei;\n    uint256 public immutable curveSteepnessWad;\n\n    bool public curveActive;\n    bool public bootstrapDistributed;\n    uint256 private _locked = 1;\n\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\n    event CurveActivated(uint256 tokenLiquidity);\n    event BootstrapAllocated(address indexed recipient, uint256 tokenAmount);\n    event TokensPurchased(\n        address indexed buyer, address indexed recipient, uint256 tokenAmount, uint256 costWei, uint256 refundWei\n    );\n    event TokensSold(address indexed seller, address indexed recipient, uint256 tokenAmount, uint256 payoutWei);\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"not owner\");\n        _;\n    }\n\n    modifier nonReentrant() {\n        require(_locked == 1, \"reentrant\");\n        _locked = 2;\n        _;\n        _locked = 1;\n    }\n\n    constructor(address tokenAddress, uint256 initialBasePricePerTokenWei, uint256 initialCurveSteepnessWad) {\n        require(tokenAddress != address(0), \"zero token\");\n        require(initialBasePricePerTokenWei > 0, \"base price too low\");\n        require(initialCurveSteepnessWad > 0, \"zero steepness\");\n        require(initialCurveSteepnessWad <= MAX_EXPONENT_WAD, \"steepness too high\");\n\n        token = FrontlineToken(tokenAddress);\n        owner = msg.sender;\n        basePricePerTokenWei = initialBasePricePerTokenWei;\n        curveSteepnessWad = initialCurveSteepnessWad;\n\n        emit OwnershipTransferred(address(0), msg.sender);\n    }\n\n    function activateCurve() external onlyOwner {\n        require(!curveActive, \"curve active\");\n        token.mint(address(this), INITIAL_LAUNCH_SUPPLY);\n        curveActive = true;\n        emit CurveActivated(INITIAL_LAUNCH_SUPPLY);\n    }\n\n    function bootstrapAllocation(address recipient, uint256 tokenAmount) external onlyOwner {\n        require(curveActive, \"curve inactive\");\n        require(!bootstrapDistributed, \"bootstrap done\");\n        require(recipient != address(0), \"zero recipient\");\n        require(tokenAmount > 0, \"zero amount\");\n        require(tokenAmount <= currentLiquidity(), \"insufficient curve liquidity\");\n\n        bootstrapDistributed = true;\n        require(token.transfer(recipient, tokenAmount), \"token transfer failed\");\n\n        emit BootstrapAllocated(recipient, tokenAmount);\n    }\n\n    function transferOwnership(address newOwner) external onlyOwner {\n        require(newOwner != address(0), \"zero address\");\n        emit OwnershipTransferred(owner, newOwner);\n        owner = newOwner;\n    }\n\n    function currentLiquidity() public view returns (uint256) {\n        return token.balanceOf(address(this));\n    }\n\n    function soldSupply() public view returns (uint256) {\n        return INITIAL_LAUNCH_SUPPLY - currentLiquidity();\n    }\n\n    function spotPricePerTokenWei() external view returns (uint256) {\n        if (!curveActive) return basePricePerTokenWei;\n        uint256 exponent = _curveExponentWad(soldSupply());\n        return _mulDiv(basePricePerTokenWei, _expWad(exponent), WAD);\n    }\n\n    function spotPricePerUnitWei() public view returns (uint256) {\n        if (!curveActive) return _mulDiv(basePricePerTokenWei, 1, TOKEN_SCALE);\n        uint256 exponent = _curveExponentWad(soldSupply());\n        return _mulDiv(basePricePerTokenWei, _expWad(exponent), WAD * TOKEN_SCALE);\n    }\n\n    function quoteBuyExactTokens(uint256 tokenAmount) public view returns (uint256) {\n        require(curveActive, \"curve inactive\");\n        require(tokenAmount > 0, \"zero amount\");\n\n        uint256 liquidity = currentLiquidity();\n        require(tokenAmount <= liquidity, \"insufficient curve liquidity\");\n\n        uint256 soldBefore = INITIAL_LAUNCH_SUPPLY - liquidity;\n        return _integralCost(soldBefore, soldBefore + tokenAmount);\n    }\n\n    function quoteSellExactTokens(uint256 tokenAmount) public view returns (uint256) {\n        require(curveActive, \"curve inactive\");\n        require(tokenAmount > 0, \"zero amount\");\n\n        uint256 soldBefore = soldSupply();\n        require(tokenAmount <= soldBefore, \"sell exceeds circulating\");\n        return _integralCost(soldBefore - tokenAmount, soldBefore);\n    }\n\n    function buyExactTokens(uint256 tokenAmount, uint256 maxCostWei, address recipient)\n        external\n        payable\n        nonReentrant\n        returns (uint256 costWei)\n    {\n        require(recipient != address(0), \"zero recipient\");\n        costWei = quoteBuyExactTokens(tokenAmount);\n        require(costWei <= maxCostWei, \"slippage\");\n        require(msg.value >= costWei, \"insufficient payment\");\n\n        require(token.transfer(recipient, tokenAmount), \"token transfer failed\");\n\n        uint256 refundWei = msg.value - costWei;\n        if (refundWei > 0) {\n            (bool refunded,) = payable(msg.sender).call{value: refundWei}(\"\");\n            require(refunded, \"refund failed\");\n        }\n\n        emit TokensPurchased(msg.sender, recipient, tokenAmount, costWei, refundWei);\n    }\n\n    function sellExactTokens(uint256 tokenAmount, uint256 minPayoutWei, address payable recipient)\n        external\n        nonReentrant\n        returns (uint256 payoutWei)\n    {\n        require(recipient != address(0), \"zero recipient\");\n        payoutWei = quoteSellExactTokens(tokenAmount);\n        require(payoutWei >= minPayoutWei, \"slippage\");\n        require(address(this).balance >= payoutWei, \"insufficient reserve\");\n\n        require(token.transferFrom(msg.sender, address(this), tokenAmount), \"token transfer failed\");\n        (bool sent,) = recipient.call{value: payoutWei}(\"\");\n        require(sent, \"payout failed\");\n\n        emit TokensSold(msg.sender, recipient, tokenAmount, payoutWei);\n    }\n\n    function _integralCost(uint256 soldFrom, uint256 soldTo) internal view returns (uint256) {\n        uint256 fromExp = _expWad(_curveExponentWad(soldFrom));\n        uint256 toExp = _expWad(_curveExponentWad(soldTo));\n        uint256 liquidityScaledPrice = _mulDiv(basePricePerTokenWei, INITIAL_LAUNCH_SUPPLY, TOKEN_SCALE);\n        return _mulDiv(liquidityScaledPrice, toExp - fromExp, curveSteepnessWad);\n    }\n\n    function _curveExponentWad(uint256 soldAmount) internal view returns (uint256) {\n        return (soldAmount * curveSteepnessWad) / INITIAL_LAUNCH_SUPPLY;\n    }\n\n    /// @dev Positive-only wad exponent with range reduction. Halving the\n    ///      exponent before the Taylor evaluation keeps the approximation stable\n    ///      across the configured launch range, then repeated squaring rebuilds\n    ///      the original value.\n    function _expWad(uint256 xWad) internal pure returns (uint256 result) {\n        require(xWad <= MAX_EXPONENT_WAD, \"exponent too high\");\n\n        uint256 reduced = xWad;\n        uint256 halvings;\n        while (reduced > RANGE_REDUCTION_THRESHOLD_WAD) {\n            reduced /= 2;\n            halvings++;\n        }\n\n        result = _expTaylorWad(reduced);\n        for (uint256 i; i < halvings; i++) {\n            result = _mulDiv(result, result, WAD);\n        }\n    }\n\n    function _expTaylorWad(uint256 xWad) internal pure returns (uint256 result) {\n        result = WAD;\n        uint256 term = WAD;\n\n        for (uint256 i = 1; i <= MAX_TAYLOR_TERMS; i++) {\n            term = _mulDiv(term, xWad, WAD * i);\n            if (term == 0) break;\n            result += term;\n        }\n    }\n\n    /// @dev 512-bit multiply/divide adapted for pricing math so large\n    ///      configuration values do not silently overflow intermediate products.\n    function _mulDiv(uint256 x, uint256 y, uint256 denominator) internal pure returns (uint256 result) {\n        require(denominator > 0, \"zero denominator\");\n\n        uint256 prod0;\n        uint256 prod1;\n        assembly {\n            let mm := mulmod(x, y, not(0))\n            prod0 := mul(x, y)\n            prod1 := sub(sub(mm, prod0), lt(mm, prod0))\n        }\n\n        if (prod1 == 0) {\n            return prod0 / denominator;\n        }\n\n        require(denominator > prod1, \"mulDiv overflow\");\n\n        uint256 remainder;\n        assembly {\n            remainder := mulmod(x, y, denominator)\n            prod1 := sub(prod1, gt(remainder, prod0))\n            prod0 := sub(prod0, remainder)\n        }\n\n        uint256 twos = denominator & (~denominator + 1);\n        assembly {\n            denominator := div(denominator, twos)\n            prod0 := div(prod0, twos)\n            twos := add(div(sub(0, twos), twos), 1)\n        }\n\n        prod0 |= prod1 * twos;\n\n        uint256 inverse = (3 * denominator) ^ 2;\n        inverse *= 2 - denominator * inverse;\n        inverse *= 2 - denominator * inverse;\n        inverse *= 2 - denominator * inverse;\n        inverse *= 2 - denominator * inverse;\n        inverse *= 2 - denominator * inverse;\n        inverse *= 2 - denominator * inverse;\n\n        result = prod0 * inverse;\n    }\n}\n"
+    },
+    "src/FrontlineToken.sol": {
+      "keccak256": "0xa2d5eb4bed85f52e81a2e887e57a28b7eeb68c0cf24ae9f24f168cba142268a7",
+      "license": "MIT",
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport {IERC20} from \"forge-std/interfaces/IERC20.sol\";\n\n/// @title FrontlineToken (FLT) — mainnet-oriented protocol token\n/// @notice Faucet minting is disabled. New issuance is restricted to\n///         explicitly authorized contracts such as the bonding curve.\ncontract FrontlineToken is IERC20 {\n    string public constant name = \"Frontline Token\";\n    string public constant symbol = \"FLT\";\n    uint8 public constant decimals = 8;\n\n    address public owner;\n    uint256 public totalSupply;\n    mapping(address => uint256) public balanceOf;\n    mapping(address => mapping(address => uint256)) public allowance;\n    mapping(address => bool) public authorizedMinters;\n\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\n    event AuthorizedMinterUpdated(address indexed minter, bool authorized);\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"not owner\");\n        _;\n    }\n\n    modifier onlyAuthorizedMinter() {\n        require(authorizedMinters[msg.sender], \"not authorized minter\");\n        _;\n    }\n\n    constructor() {\n        owner = msg.sender;\n        emit OwnershipTransferred(address(0), msg.sender);\n    }\n\n    function setAuthorizedMinter(address minter, bool authorized) external onlyOwner {\n        require(minter != address(0), \"zero address\");\n        authorizedMinters[minter] = authorized;\n        emit AuthorizedMinterUpdated(minter, authorized);\n    }\n\n    function transferOwnership(address newOwner) external onlyOwner {\n        require(newOwner != address(0), \"zero address\");\n        emit OwnershipTransferred(owner, newOwner);\n        owner = newOwner;\n    }\n\n    function mint(address to, uint256 amount) external onlyAuthorizedMinter {\n        require(to != address(0), \"zero address\");\n        _mint(to, amount);\n    }\n\n    function approve(address spender, uint256 amount) external returns (bool) {\n        allowance[msg.sender][spender] = amount;\n        emit Approval(msg.sender, spender, amount);\n        return true;\n    }\n\n    function transfer(address to, uint256 amount) external returns (bool) {\n        _transfer(msg.sender, to, amount);\n        return true;\n    }\n\n    function transferFrom(address from, address to, uint256 amount) external returns (bool) {\n        require(balanceOf[from] >= amount, \"insufficient balance\");\n        if (allowance[from][msg.sender] != type(uint256).max) {\n            require(allowance[from][msg.sender] >= amount, \"insufficient allowance\");\n            allowance[from][msg.sender] -= amount;\n        }\n        _transfer(from, to, amount);\n        return true;\n    }\n\n    function _transfer(address from, address to, uint256 amount) internal {\n        require(to != address(0), \"zero address\");\n        require(balanceOf[from] >= amount, \"insufficient balance\");\n        balanceOf[from] -= amount;\n        balanceOf[to] += amount;\n        emit Transfer(from, to, amount);\n    }\n\n    function _mint(address to, uint256 amount) internal {\n        balanceOf[to] += amount;\n        totalSupply += amount;\n        emit Transfer(address(0), to, amount);\n    }\n}\n"
+    }
+  },
+  "version": 1
+}

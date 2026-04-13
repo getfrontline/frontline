@@ -1,0 +1,30 @@
+{
+  "network": "mainnet",
+  "deployerAccountId": "0.0.10431781",
+  "deployerEvmAddress": "0x31ec9a87e446e8a747431e8657609793d241166a",
+  "curveBasePricePerTokenTinybar": "2000",
+  "curveSteepnessWad": "2000000000000000000",
+  "poolSeedTokens": "1000000000000000",
+  "contracts": {
+    "flt": {
+      "label": "FrontlineToken",
+      "contractId": "0.0.10431906",
+      "evmAddress": "0x00000000000000000000000000000000009f2da2"
+    },
+    "pool": {
+      "label": "FrontlinePool",
+      "contractId": "0.0.10431909",
+      "evmAddress": "0x00000000000000000000000000000000009f2da5"
+    },
+    "reputation": {
+      "label": "FrontlineReputation",
+      "contractId": "0.0.10431911",
+      "evmAddress": "0x00000000000000000000000000000000009f2da7"
+    },
+    "curve": {
+      "label": "FrontlineBondingCurve",
+      "contractId": "0.0.10431914",
+      "evmAddress": "0x00000000000000000000000000000000009f2daa"
+    }
+  }
+}

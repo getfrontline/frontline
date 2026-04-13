@@ -1,8 +1,9 @@
 import { CONTRACTS } from "@/lib/contracts";
 import { FLT_DECIMALS } from "@/lib/session/catalog";
+import { HEDERA_MIRROR_NODE_URL, HEDERA_RPC_URL } from "@/lib/wallet/network-config";
 
-const MIRROR_NODE_REST = "https://testnet.mirrornode.hedera.com/api/v1";
-const MIRROR_RPC = "https://testnet.hashio.io/api";
+const MIRROR_NODE_REST = HEDERA_MIRROR_NODE_URL;
+const MIRROR_RPC = HEDERA_RPC_URL;
 const contractAddressCache = new Map<string, string>();
 
 type MirrorAccountResponse = {

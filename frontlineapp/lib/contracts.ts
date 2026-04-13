@@ -1,3 +1,5 @@
+import { HEDERA_HASHSCAN_NETWORK } from "@/lib/wallet/network-config";
+
 export const CONTRACTS = {
   flt: process.env.NEXT_PUBLIC_FLT_TOKEN_ADDRESS ?? "",
   pool: process.env.NEXT_PUBLIC_FRONTLINE_POOL_ADDRESS ?? "",
@@ -11,5 +13,5 @@ export function shortAddr(addr: string): string {
 }
 
 export function hashscanUrl(addr: string, type: "contract" | "account" | "token" = "contract"): string {
-  return `https://hashscan.io/testnet/${type}/${addr}`;
+  return `https://hashscan.io/${HEDERA_HASHSCAN_NETWORK}/${type}/${addr}`;
 }
