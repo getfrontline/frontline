@@ -7,6 +7,7 @@ import { FLT_DECIMALS } from "@/lib/session/catalog";
 import { fmtFlt } from "@/lib/session/format";
 import { useFrontlineSession } from "@/lib/session/session-store";
 import { buildRegisterMerchant, buildUpdateMerchant, buildAddProduct, buildMerchantWithdraw } from "@/lib/wallet/transactions";
+import { HEDERA_MIRROR_NODE_URL } from "@/lib/wallet/network-config";
 
 export function RegisterView() {
   const { status, accountId, sendTx } = useWallet();
@@ -97,8 +98,8 @@ export function RegisterView() {
       const priceRaw = BigInt(Math.round(priceNum * 10 ** FLT_DECIMALS));
       // The merchant passes their own account ID; the contract resolves the EVM address.
       // We need the EVM address for the addProduct call.
-      // Use the mirror node lookup to get our EVM address.
-      const res = await fetch(`https://testnet.mirrornode.hedera.com/api/v1/accounts/${accountId}`);
+      const res = await fetch(`${HEDERA_MIRROR_NODE_URL}/accounts/${accountId}`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Mirror Node account lookup failed: ${res.status}`);
       const json = await res.json();
       const evmAddr = json.evm_address as string;
       if (!evmAddr) throw new Error("Could not resolve your EVM address");
