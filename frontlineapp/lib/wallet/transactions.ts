@@ -6,11 +6,7 @@ const REGISTER_GAS = 1_000_000;
 const BNPL_GAS = 1_000_000;
 
 async function loadSdk() {
-  const [sdk, Long] = await Promise.all([
-    import("@hashgraph/sdk"),
-    import("long"),
-  ]);
-  return { ...sdk, Long: Long.default };
+  return import("@hashgraph/sdk");
 }
 
 async function accountMirrorRecord(accountId: string) {
@@ -25,8 +21,8 @@ function nodeIds(AccountId: typeof import("@hashgraph/sdk").AccountId) {
   return HEDERA_NODE_IDS.map((n) => AccountId.fromString(n));
 }
 
-function toLong(Long: typeof import("long").default, n: number | bigint): import("long").default {
-  return Long.fromString(n.toString());
+function toUint256String(n: number | bigint): string {
+  return BigInt(n).toString();
 }
 
 function toContractId(
@@ -87,7 +83,6 @@ export async function buildBuyCurveTokens(
     TransactionId,
     ContractFunctionParameters,
     Hbar,
-    Long,
   } = sdk;
   if (!CONTRACTS.curve) throw new Error("Bonding curve address not configured");
   const acctId = AccountId.fromString(userAccountId);
@@ -98,12 +93,12 @@ export async function buildBuyCurveTokens(
   return new ContractExecuteTransaction()
     .setContractId(toContractId(ContractId, CONTRACTS.curve))
     .setGas(GAS)
-    .setPayableAmount(Hbar.fromTinybars(toLong(Long, maxCostTinybar)))
+    .setPayableAmount(Hbar.fromTinybars(toUint256String(maxCostTinybar)))
     .setFunction(
       "buyExactTokens",
       new ContractFunctionParameters()
-        .addUint256(toLong(Long, tokenAmountRaw))
-        .addUint256(toLong(Long, maxCostTinybar))
+        .addUint256(toUint256String(tokenAmountRaw))
+        .addUint256(toUint256String(maxCostTinybar))
         .addAddress(recipientAddr),
     )
     .setNodeAccountIds(nodeIds(AccountId))
@@ -113,7 +108,7 @@ export async function buildBuyCurveTokens(
 
 export async function buildApprovePool(userAccountId: string, amountRaw: number | bigint) {
   const sdk = await loadSdk();
-  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters, Long } = sdk;
+  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters } = sdk;
   if (!CONTRACTS.flt || !CONTRACTS.pool) throw new Error("Contract addresses not configured");
   const acctId = AccountId.fromString(userAccountId);
   const poolAddr = toSolidityAddr(AccountId, CONTRACTS.pool);
@@ -124,7 +119,7 @@ export async function buildApprovePool(userAccountId: string, amountRaw: number 
       "approve",
       new ContractFunctionParameters()
         .addAddress(poolAddr)
-        .addUint256(toLong(Long, amountRaw)),
+        .addUint256(toUint256String(amountRaw)),
     )
     .setNodeAccountIds(nodeIds(AccountId))
     .setTransactionId(TransactionId.generate(acctId))
@@ -133,13 +128,13 @@ export async function buildApprovePool(userAccountId: string, amountRaw: number 
 
 export async function buildStake(userAccountId: string, amountRaw: number | bigint) {
   const sdk = await loadSdk();
-  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters, Long } = sdk;
+  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters } = sdk;
   if (!CONTRACTS.pool) throw new Error("Pool address not configured");
   const acctId = AccountId.fromString(userAccountId);
   return new ContractExecuteTransaction()
     .setContractId(toContractId(ContractId, CONTRACTS.pool))
     .setGas(GAS)
-    .setFunction("stake", new ContractFunctionParameters().addUint256(toLong(Long, amountRaw)))
+    .setFunction("stake", new ContractFunctionParameters().addUint256(toUint256String(amountRaw)))
     .setNodeAccountIds(nodeIds(AccountId))
     .setTransactionId(TransactionId.generate(acctId))
     .freeze();
@@ -147,13 +142,13 @@ export async function buildStake(userAccountId: string, amountRaw: number | bigi
 
 export async function buildUnstake(userAccountId: string, amountRaw: number | bigint) {
   const sdk = await loadSdk();
-  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters, Long } = sdk;
+  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters } = sdk;
   if (!CONTRACTS.pool) throw new Error("Pool address not configured");
   const acctId = AccountId.fromString(userAccountId);
   return new ContractExecuteTransaction()
     .setContractId(toContractId(ContractId, CONTRACTS.pool))
     .setGas(GAS)
-    .setFunction("unstake", new ContractFunctionParameters().addUint256(toLong(Long, amountRaw)))
+    .setFunction("unstake", new ContractFunctionParameters().addUint256(toUint256String(amountRaw)))
     .setNodeAccountIds(nodeIds(AccountId))
     .setTransactionId(TransactionId.generate(acctId))
     .freeze();
@@ -165,14 +160,14 @@ export async function buildOpenBnpl(
   amounts: bigint[],
 ) {
   const sdk = await loadSdk();
-  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters, Long } = sdk;
+  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters } = sdk;
   if (!CONTRACTS.pool) throw new Error("Pool address not configured");
   const acctId = AccountId.fromString(userAccountId);
   const solAddrs = merchantAddrs.map((a) => toSolidityAddr(AccountId, a));
-  const longAmounts = amounts.map((a) => toLong(Long, a));
+  const bnplAmounts = amounts.map((a) => toUint256String(a));
   const params = new ContractFunctionParameters()
     .addAddressArray(solAddrs)
-    .addUint256Array(longAmounts);
+    .addUint256Array(bnplAmounts);
   return new ContractExecuteTransaction()
     .setContractId(toContractId(ContractId, CONTRACTS.pool))
     .setGas(BNPL_GAS)
@@ -184,7 +179,7 @@ export async function buildOpenBnpl(
 
 export async function buildRepay(userAccountId: string, loanId: number | bigint, amountRaw: number | bigint) {
   const sdk = await loadSdk();
-  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters, Long } = sdk;
+  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters } = sdk;
   if (!CONTRACTS.pool) throw new Error("Pool address not configured");
   const acctId = AccountId.fromString(userAccountId);
   return new ContractExecuteTransaction()
@@ -193,8 +188,8 @@ export async function buildRepay(userAccountId: string, loanId: number | bigint,
     .setFunction(
       "repay",
       new ContractFunctionParameters()
-        .addUint256(toLong(Long, loanId))
-        .addUint256(toLong(Long, amountRaw)),
+        .addUint256(toUint256String(loanId))
+        .addUint256(toUint256String(amountRaw)),
     )
     .setNodeAccountIds(nodeIds(AccountId))
     .setTransactionId(TransactionId.generate(acctId))
@@ -253,7 +248,7 @@ export async function buildAddProduct(
   priceRaw: number | bigint,
 ) {
   const sdk = await loadSdk();
-  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters, Long } = sdk;
+  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters } = sdk;
   if (!CONTRACTS.pool) throw new Error("Pool address not configured");
   const acctId = AccountId.fromString(userAccountId);
   const solAddr = toSolidityAddr(AccountId, merchantEvmAddr);
@@ -265,7 +260,7 @@ export async function buildAddProduct(
       new ContractFunctionParameters()
         .addAddress(solAddr)
         .addString(productName)
-        .addUint256(toLong(Long, priceRaw)),
+        .addUint256(toUint256String(priceRaw)),
     )
     .setNodeAccountIds(nodeIds(AccountId))
     .setTransactionId(TransactionId.generate(acctId))
@@ -274,7 +269,7 @@ export async function buildAddProduct(
 
 export async function buildMerchantWithdraw(userAccountId: string, amountRaw: number | bigint) {
   const sdk = await loadSdk();
-  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters, Long } = sdk;
+  const { ContractExecuteTransaction, AccountId, ContractId, TransactionId, ContractFunctionParameters } = sdk;
   if (!CONTRACTS.pool) throw new Error("Pool address not configured");
   const acctId = AccountId.fromString(userAccountId);
   return new ContractExecuteTransaction()
@@ -282,7 +277,7 @@ export async function buildMerchantWithdraw(userAccountId: string, amountRaw: nu
     .setGas(GAS)
     .setFunction(
       "merchantWithdraw",
-      new ContractFunctionParameters().addUint256(toLong(Long, amountRaw)),
+      new ContractFunctionParameters().addUint256(toUint256String(amountRaw)),
     )
     .setNodeAccountIds(nodeIds(AccountId))
     .setTransactionId(TransactionId.generate(acctId))

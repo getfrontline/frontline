@@ -20,6 +20,8 @@ const SELECTORS: Record<string, string> = {
   "soldSupply()": "fa2299ee",
   "spotPricePerTokenWei()": "a2053b8c",
   "quoteBuyExactTokens(uint256)": "af769545",
+  "basePricePerTokenWei()": "39c4b49f",
+  "curveSteepnessWad()": "ac7df5f7",
 };
 
 function sel(sig: string): string {
@@ -217,4 +219,21 @@ export async function quoteCurveBuyExactTokens(tokenAmountRaw: bigint): Promise<
   return decodeUint256(
     await ethCall(CONTRACTS.curve, sel("quoteBuyExactTokens(uint256)") + padUint256(tokenAmountRaw)),
   );
+}
+
+export type CurveConfig = {
+  basePricePerTokenWei: bigint;
+  curveSteepnessWad: bigint;
+};
+
+export async function fetchCurveConfig(): Promise<CurveConfig | null> {
+  if (!CONTRACTS.curve) return null;
+  const [baseHex, steepHex] = await Promise.all([
+    ethCall(CONTRACTS.curve, sel("basePricePerTokenWei()")),
+    ethCall(CONTRACTS.curve, sel("curveSteepnessWad()")),
+  ]);
+  return {
+    basePricePerTokenWei: decodeUint256(baseHex),
+    curveSteepnessWad: decodeUint256(steepHex),
+  };
 }

@@ -1,12 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CONTRACTS, hashscanUrl, shortAddr } from "@/lib/contracts";
 import { fmtFlt } from "@/lib/session/format";
 import { useFrontlineSession } from "@/lib/session/session-store";
-import { fetchTokenStats, quoteCurveBuyExactTokens } from "@/lib/wallet/contract-reads";
+import {
+  fetchCurveConfig,
+  fetchTokenStats,
+  quoteCurveBuyExactTokens,
+} from "@/lib/wallet/contract-reads";
+import { generateCurvePoints } from "@/lib/wallet/curve-chart";
 import { useWallet } from "@/lib/wallet/hedera";
 import { buildAssociateFlt, buildBuyCurveTokens } from "@/lib/wallet/transactions";
+import { CurveChart } from "@/components/dashboard/CurveChart";
+import { CurveTransactions } from "@/components/dashboard/CurveTransactions";
 
 const FLT_DECIMALS = 8;
 
@@ -36,6 +43,7 @@ export function TokenView() {
     soldSupplyFlt: 0,
     spotPriceHbar: 0,
   });
+  const [curveConfig, setCurveConfig] = useState<{ basePricePerTokenWei: bigint; curveSteepnessWad: bigint } | null>(null);
   const [txStatus, setTxStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,13 +52,25 @@ export function TokenView() {
   const parsedBuyAmount = Number.isFinite(tokenAmount) && tokenAmount > 0 ? Math.floor(tokenAmount) : 0;
   const quoteHbar = Number(quoteTinybar) / 1e8;
 
+  const marketCap = useMemo(() => {
+    return stats.soldSupplyFlt * stats.spotPriceHbar;
+  }, [stats.soldSupplyFlt, stats.spotPriceHbar]);
+
+  const chartPoints = useMemo(() => {
+    if (!curveConfig) return [];
+    return generateCurvePoints(curveConfig.basePricePerTokenWei, curveConfig.curveSteepnessWad, 80);
+  }, [curveConfig]);
+
   useEffect(() => {
     let cancelled = false;
 
     async function syncStats() {
       try {
-        const next = await fetchTokenStats();
-        if (!cancelled) setStats(next);
+        const [next, cfg] = await Promise.all([fetchTokenStats(), fetchCurveConfig()]);
+        if (!cancelled) {
+          setStats(next);
+          if (cfg) setCurveConfig(cfg);
+        }
       } catch (err) {
         if (!cancelled) {
           console.error("[Frontline] token stats failed", err);
@@ -93,8 +113,9 @@ export function TokenView() {
 
   const refreshAll = async () => {
     await refreshFromChain();
-    const next = await fetchTokenStats();
+    const [next, cfg] = await Promise.all([fetchTokenStats(), fetchCurveConfig()]);
     setStats(next);
+    if (cfg) setCurveConfig(cfg);
   };
 
   const handleAssociate = async () => {
@@ -151,9 +172,29 @@ export function TokenView() {
         FLT bonding curve
       </h1>
       <p className="mt-3 max-w-2xl text-sm text-[var(--text-secondary)]">
-        Associate FLT to your Hedera wallet, then buy launch inventory directly from the curve. This replaces the
-        old faucet flow for testnet usage.
+        Associate FLT to your Hedera wallet, then buy launch inventory directly from the curve. This replaces the old
+        faucet flow for testnet usage.
       </p>
+
+      {/* Market cap banner */}
+      <div className="border-accent-mint/20 bg-accent-mint/5 mt-8 flex flex-col gap-3 rounded-2xl border p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+        <div>
+          <p className="text-accent-mint text-xs font-bold uppercase tracking-wider">Market cap</p>
+          <p className="font-display mt-1 text-3xl font-bold tabular-nums text-[var(--text-primary)]">
+            {fmtHbar(marketCap, 2)}
+          </p>
+        </div>
+        <div className="flex gap-6">
+          <div className="text-right">
+            <p className="text-muted text-[10px] font-bold uppercase tracking-wider">Sold supply</p>
+            <p className="font-mono mt-1 text-sm text-[var(--text-primary)]">{fmtFlt(stats.soldSupplyFlt, 0)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-muted text-[10px] font-bold uppercase tracking-wider">Spot price</p>
+            <p className="font-mono mt-1 text-sm text-[var(--accent-cyan)]">{fmtHbar(stats.spotPriceHbar, 6)}</p>
+          </div>
+        </div>
+      </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-5">
         <div className="border-border bg-surface-card rounded-2xl border p-6 lg:col-span-3">
@@ -190,7 +231,7 @@ export function TokenView() {
                 <div>
                   <p className="text-muted text-[10px] font-bold uppercase tracking-wider">Step 2 — Buy from curve</p>
                   <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                    Quotes are fetched live from the Hedera testnet bonding curve.
+                    Quotes are fetched live from the Hedera bonding curve.
                   </p>
                 </div>
                 <p className="font-mono text-xs text-[var(--accent-cyan)]">
@@ -228,13 +269,15 @@ export function TokenView() {
         </div>
 
         <div className="border-border bg-surface-elevated/80 rounded-2xl border p-6 lg:col-span-2">
-          <h2 className="font-display text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">Curve stats</h2>
+          <h2 className="font-display text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">
+            Curve stats
+          </h2>
           <dl className="mt-4 space-y-3 text-sm">
             {[
               { k: "Available liquidity", v: fmtFlt(stats.curveLiquidityFlt, 0) },
               { k: "Sold supply", v: fmtFlt(stats.soldSupplyFlt, 0) },
               { k: "Spot price", v: fmtHbar(stats.spotPriceHbar, 6) },
-              { k: "Launch inventory", v: "50,000 FLT" },
+              { k: "Launch inventory", v: "1,000,000,000 FLT" },
             ].map((row) => (
               <div key={row.k} className="flex justify-between gap-4">
                 <dt className="text-muted">{row.k}</dt>
@@ -274,6 +317,39 @@ export function TokenView() {
               </div>
             ) : null}
           </dl>
+        </div>
+      </div>
+
+      {/* Chart + Transactions row */}
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <div className="border-border bg-surface-card rounded-2xl border p-6">
+          <h2 className="font-display text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">
+            Price curve
+          </h2>
+          <p className="text-muted mt-1 text-xs">
+            Exponential price as a function of sold supply. Orange dot marks the current position.
+          </p>
+          <div className="mt-4">
+            {chartPoints.length > 0 ? (
+              <CurveChart
+                points={chartPoints}
+                currentSold={stats.soldSupplyFlt}
+                currentPrice={stats.spotPriceHbar}
+              />
+            ) : (
+              <p className="text-muted py-8 text-center text-xs">Loading curve parameters…</p>
+            )}
+          </div>
+        </div>
+
+        <div className="border-border bg-surface-card rounded-2xl border p-6">
+          <h2 className="font-display text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">
+            Recent activity
+          </h2>
+          <p className="text-muted mt-1 text-xs">Latest buy and sell transactions on the bonding curve.</p>
+          <div className="mt-4">
+            <CurveTransactions />
+          </div>
         </div>
       </div>
     </main>
